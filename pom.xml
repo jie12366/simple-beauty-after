@@ -120,6 +120,21 @@
             <artifactId>java-jwt</artifactId>
             <version>3.4.0</version>
         </dependency>
+
+        <!--榛子短信SDK-->
+        <dependency>
+            <groupId>com.zhenzikj</groupId>
+            <artifactId>zhenzisms</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
+        <!-- commons-lang3集合类库 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

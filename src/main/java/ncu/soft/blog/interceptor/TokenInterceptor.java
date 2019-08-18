@@ -1,15 +1,13 @@
 package ncu.soft.blog.interceptor;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.UserService;
-import ncu.soft.blog.utils.GetString;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,6 +25,9 @@ public class TokenInterceptor implements HandlerInterceptor {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    ValueOperations<String ,Object> valueOperations;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -70,15 +71,17 @@ public class TokenInterceptor implements HandlerInterceptor {
                     return false;
                 }
 
-                //验证token
-                String secret = GetString.getMd5(users.getUPwd());
-                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(secret)).build();
-                try {
-                    jwtVerifier.verify(token);
-                }catch (JWTVerificationException jv){
-                    //token错误
+                //token过期
+                if (!valueOperations.getOperations().hasKey("token")){
                     response.setStatus(403);
                     return false;
+                }else {
+                    //token错误
+                    String token1 = (String)valueOperations.get("token");
+                    if (!StringUtils.equals(token1,token)){
+                        response.setStatus(401);
+                        return false;
+                    }
                 }
             }
             return true;

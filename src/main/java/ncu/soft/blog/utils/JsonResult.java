@@ -8,7 +8,7 @@ import lombok.Data;
  * 200：表示成功
  * 401：未登录
  * 403：客户端token过期
- * 500：其他错误，错误信息在msg字段中
+ * 500：服务器错误，错误信息在msg字段中
  * @author www.xyj123.xyz
  * @date 2019/3/30 13:57
  */
@@ -18,7 +18,7 @@ public class JsonResult {
     /**
      * 响应业务状态
      */
-    private Integer status;
+    private Integer code;
 
     /**
      * 响应消息
@@ -30,60 +30,54 @@ public class JsonResult {
      */
     private Object data;
 
-    /**
-     * 带数据成功返回
-     * @param data 返回的数据
-     * @return new JsonResult(data)
-     */
-    public static JsonResult ok(Object data) {
-        return new JsonResult(data);
-    }
+    public JsonResult() {}
 
-    /**
-     * 无参返回成功，OK
-     * @return new JsonResult(msg)
-     */
-    public static JsonResult ok() {
-        Object msg = "OK";
-        return new JsonResult(msg);
-    }
-
-    /**
-     * 用户未登录
-     * @param msg 返回的错误信息
-     * @return new JsonResult(401,msg)
-     */
-    public static JsonResult errorNotLogin(String msg) {
-        return new JsonResult(401,msg);
-    }
-
-    /**
-     * token过期
-     * @param msg 错误信息
-     * @return new JsonResult(403,msg)
-     */
-    public static JsonResult errorTokenExpired(String msg) {
-        return new JsonResult(403,msg);
-    }
-
-    /**
-     * 其他错误
-     * @param msg 要返回的错误信息
-     * @return new JsonResult(500,msg)
-     */
-    public static JsonResult errorMsg(String msg) {
-        return new JsonResult(500,msg);
-    }
-
-    private JsonResult(Object data) {
-        this.status = 200;
-        this.msg = "OK";
-        this.data = data;
-    }
-
-    private JsonResult(int status,String msg) {
-        this.status = status;
+    public JsonResult(Integer code, String msg) {
+        this.code = code;
         this.msg = msg;
-        this.data = null;
+    }
+
+    public static JsonResult success() {
+        JsonResult result = new JsonResult();
+        result.setResultCode(ResultCode.SUCCESS);
+        return result;
+    }
+
+    public static JsonResult success(ResultCode code) {
+        JsonResult result = new JsonResult();
+        result.setResultCode(code);
+        return result;
+    }
+
+    public static JsonResult success(Object data) {
+        JsonResult result = new JsonResult();
+        result.setResultCode(ResultCode.SUCCESS);
+        result.setData(data);
+        return result;
+    }
+
+    public static JsonResult success(ResultCode resultCode, Object data) {
+        JsonResult result = new JsonResult();
+        result.setResultCode(resultCode);
+        result.setData(data);
+        return result;
+    }
+
+    public static JsonResult failure(ResultCode resultCode) {
+        JsonResult result = new JsonResult();
+        result.setResultCode(resultCode);
+        return result;
+    }
+
+    public static JsonResult failure(ResultCode resultCode, Object data) {
+        JsonResult result = new JsonResult();
+        result.setResultCode(resultCode);
+        result.setData(data);
+        return result;
+    }
+
+    private void setResultCode(ResultCode code) {
+        this.code = code.code();
+        this.msg = code.message();
     }
 }

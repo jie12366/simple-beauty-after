@@ -43,22 +43,9 @@ public class JsonResult {
         return result;
     }
 
-    public static JsonResult success(ResultCode code) {
-        JsonResult result = new JsonResult();
-        result.setResultCode(code);
-        return result;
-    }
-
     public static JsonResult success(Object data) {
         JsonResult result = new JsonResult();
         result.setResultCode(ResultCode.SUCCESS);
-        result.setData(data);
-        return result;
-    }
-
-    public static JsonResult success(ResultCode resultCode, Object data) {
-        JsonResult result = new JsonResult();
-        result.setResultCode(resultCode);
         result.setData(data);
         return result;
     }

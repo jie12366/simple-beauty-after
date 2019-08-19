@@ -30,10 +30,10 @@ public class BlogApplicationTests {
 
     @Test
     public void testMongo(){
-//        Users users = new Users("13330114338","123456");
-//        String secret = GetString.getMd5(users.getUPwd());
-//        System.out.println(mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(users.getUAccount())
-//                .and("uPwd").is(secret)),Users.class));
+        Users users = new Users("13330114338","123456");
+        String secret = GetString.getMd5(users.getUPwd());
+        System.out.println(mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(users.getUAccount())
+                .and("uPwd").is(secret)),Users.class));
     }
 
     @Test

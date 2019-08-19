@@ -27,6 +27,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Users findByAccount(String account) {
+        return mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(account)),Users.class);
+    }
+
+    @Override
     public boolean isExist(String account) {
         return (mongoTemplate.findOne(
                 new Query(Criteria.where("uAccount").

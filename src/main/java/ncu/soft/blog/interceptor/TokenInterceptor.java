@@ -5,6 +5,9 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.UserService;
+import ncu.soft.blog.utils.GetString;
+import ncu.soft.blog.utils.JsonResult;
+import ncu.soft.blog.utils.ResultCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ValueOperations;
@@ -32,7 +35,7 @@ public class TokenInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //从http请求头中取出token
-        String token = request.getHeader("token");
+        String token = request.getHeader("Authorization");
 
         //如果不是方法级别的请求，则直接通过
         if (!(handler instanceof HandlerMethod)){
@@ -49,39 +52,30 @@ public class TokenInterceptor implements HandlerInterceptor {
             if (loginToken.required()){
                 //重置响应
                 response.reset();
-                // token不存在
-                if (token == null){
+                if(token == null){
                     response.setStatus(401);
-                    return false;
+                    return true;
                 }
-
                 String uid = "";
                 try {
                     uid = JWT.decode(token).getAudience().get(0);
                 }catch (JWTDecodeException jd){
                     //token取数据出问题
                     response.setStatus(401);
-                    return false;
+                    return true;
                 }
 
                 Users users = userService.findById(Integer.parseInt(uid));
-                //用户名不存在
-                if (users == null){
-                    response.setStatus(401);
-                    return false;
-                }
-
-                //token过期
-                if (!valueOperations.getOperations().hasKey("token")){
+                //token错误
+                String token1 = (String)valueOperations.get(users.getUPwd());
+                System.out.println(token1);
+                if (token1 == null){
                     response.setStatus(403);
-                    return false;
-                }else {
-                    //token错误
-                    String token1 = (String)valueOperations.get("token");
-                    if (!StringUtils.equals(token1,token)){
-                        response.setStatus(401);
-                        return false;
-                    }
+                    return true;
+                }
+                if (!StringUtils.equals(token1,token)){
+                    response.setStatus(401);
+                    return true;
                 }
             }
             return true;

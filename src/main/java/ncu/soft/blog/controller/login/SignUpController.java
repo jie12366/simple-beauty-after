@@ -1,18 +1,24 @@
 package ncu.soft.blog.controller.login;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
+import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.UserService;
 import ncu.soft.blog.utils.GetString;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +40,7 @@ public class SignUpController {
 
     @ApiOperation("发送短信验证码")
     @PostMapping("/phone")
-    public JsonResult sendMsg(HttpServletRequest request, @RequestParam("phone") String phone) throws Exception{
+    public JsonResult sendMsg(HttpServletRequest request, HttpServletResponse response, @RequestParam("phone") String phone) throws Exception{
         System.out.println(phone);
         String code = GetString.getCode();
         System.out.println("code = " + code);
@@ -68,7 +74,6 @@ public class SignUpController {
 
     @ApiOperation("账号注册")
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
     public JsonResult addUser(@Valid @RequestBody Users users){
         return JsonResult.success(userService.save(users));
     }

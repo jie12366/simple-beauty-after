@@ -17,6 +17,13 @@ public interface UserService {
     Users findById(int id);
 
     /**
+     * 根据uaccount查找users
+     * @param account 指定得账号
+     * @return Users
+     */
+    Users findByAccount(String account);
+
+    /**
      * 检查账号是否存在
      * @param account 账号
      * @return 是否存在

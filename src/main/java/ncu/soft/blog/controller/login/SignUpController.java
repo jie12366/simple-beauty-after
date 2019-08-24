@@ -1,11 +1,10 @@
 package ncu.soft.blog.controller.login;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
-import ncu.soft.blog.selfAnnotation.LoginToken;
+import ncu.soft.blog.entity.UsersInfo;
 import ncu.soft.blog.service.UserService;
+import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.GetString;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
@@ -32,6 +31,9 @@ public class SignUpController {
 
     @Resource
     UserService userService;
+
+    @Resource
+    UsersInfoService usersInfoService;
 
     @Resource
     ValueOperations<String ,Object> valueOperations;
@@ -62,10 +64,10 @@ public class SignUpController {
     @PostMapping("/captcha")
     public JsonResult checkVerifyCode(@Valid @RequestParam("key")String key,
             @Valid @RequestParam("code") String code){
-        if (!valueOperations.getOperations().hasKey(key)){
+        String verifyCode = (String) valueOperations.get(key);
+        if (verifyCode == null){
             return JsonResult.failure(ResultCode.CAPTCHA_HAS_EXPIRED);
         }
-        String verifyCode = (String) valueOperations.get(key);
         if (!StringUtils.equalsIgnoreCase(code,verifyCode)){
             return JsonResult.failure(ResultCode.CAPTCHA_IS_ERROR);
         }
@@ -75,6 +77,16 @@ public class SignUpController {
     @ApiOperation("账号注册")
     @PostMapping("/register")
     public JsonResult addUser(@Valid @RequestBody Users users){
-        return JsonResult.success(userService.save(users));
+        Users users1 = userService.save(users);
+        UsersInfo usersInfo = new UsersInfo();
+        usersInfo.setUid(users1.getId());
+        usersInfo.setNickName(users.getUAccount());
+        usersInfo.setPhone(users.getUAccount());
+        usersInfo.setHeadPath("http://cdn.jie12366.xyz/head_boy.png");
+        usersInfo.setAttentions(0);
+        usersInfo.setLikes(0);
+        usersInfo.setFans(0);
+        usersInfoService.save(usersInfo);
+        return JsonResult.success();
     }
 }

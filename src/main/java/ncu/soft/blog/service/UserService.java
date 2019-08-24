@@ -33,7 +33,7 @@ public interface UserService {
     /**
      * 保存users到数据库
      * @param users Users
-     * @return 返回插入的数据
+     * @return 返回user信息
      */
     Users save(Users users);
 

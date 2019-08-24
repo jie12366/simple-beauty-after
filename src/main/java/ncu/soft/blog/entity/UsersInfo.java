@@ -34,13 +34,23 @@ public class UsersInfo {
     /**
      * 我的昵称
      */
-    private String nikeName;
+    private String nickName;
+
+    /**
+     * 我的手机
+     */
+    private String phone;
+
+    /**
+     * 我的邮箱
+     */
+    private String email;
 
     /**
      * 我的个人介绍
      */
     @Field("dec")
-    private String description;
+    private String introduction;
 
     /**
      * 我的头像路径

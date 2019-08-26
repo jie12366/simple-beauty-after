@@ -18,15 +18,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ReplyComment {
 
     /**
-     * 评论者的用户信息
+     * 评论回复者的用户id
      */
-    @Field("rInfo")
-    private UsersInfo replyUsersInfo;
+    private int rUid;
 
     /**
      * 回复的目标用户昵称
      */
-    private int toNickName;
+    private int toNickname;
 
     /**
      * 评论回复的时间
@@ -36,5 +35,5 @@ public class ReplyComment {
     /**
      * 评论回复的内容
      */
-    private String content;
+    private String rContent;
 }

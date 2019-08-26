@@ -50,11 +50,16 @@ public class TokenInterceptor implements HandlerInterceptor {
         if(method.isAnnotationPresent(LoginToken.class)){
             LoginToken loginToken = method.getAnnotation(LoginToken.class);
             if (loginToken.required()){
-                //重置响应
-                response.reset();
+                //解决跨域问题
+                response.addHeader("Access-Control-Allow-Origin", "*");
+                response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+                response.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                response.addHeader("Access-Control-Max-Age", "3600");
+
+                //未登录
                 if(token == null){
                     response.setStatus(401);
-                    return true;
+                    return false;
                 }
                 String uid = "";
                 try {
@@ -62,20 +67,28 @@ public class TokenInterceptor implements HandlerInterceptor {
                 }catch (JWTDecodeException jd){
                     //token取数据出问题
                     response.setStatus(401);
-                    return true;
+                    return false;
                 }
 
+                //获取用户信息
                 Users users = userService.findById(Integer.parseInt(uid));
-                //token错误
-                String token1 = (String)valueOperations.get(users.getUPwd());
-                System.out.println(token1);
+
+                if (users == null){
+                    //用户不存在
+                    response.setStatus(401);
+                    return false;
+                }
+
+                String token1 = (String)valueOperations.get(token.split("\\.")[2]);
+                //token过期(登录过期)
                 if (token1 == null){
                     response.setStatus(403);
-                    return true;
+                    return false;
                 }
+                //token错误(未登录)
                 if (!StringUtils.equals(token1,token)){
                     response.setStatus(401);
-                    return true;
+                    return false;
                 }
             }
             return true;

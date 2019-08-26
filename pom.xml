@@ -135,6 +135,12 @@
             <version>3.8.1</version>
         </dependency>
 
+        <!-- html解析工具,jsoup -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.11.3</version>
+        </dependency>
     </dependencies>
 
     <build>

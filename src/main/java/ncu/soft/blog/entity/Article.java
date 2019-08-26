@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,19 +30,19 @@ public class Article {
     private int id;
 
     /**
-     * 博主用户信息
+     * 用户uid
      */
-    private UsersInfo usersInfo;
+    private int uid;
 
     /**
-     * 引用category的id
+     * 文章个人分类
      */
-    private int cid;
+    private String category;
 
     /**
-     * 文章的标签id
+     * 文章的标签
      */
-    private List<Integer> tags;
+    private List<String> tags;
 
     /**
      * 文章的封面图片路径
@@ -63,7 +64,7 @@ public class Article {
      * 文章的创建或修改时间
      */
     @Field("aTime")
-    private String articleTime;
+    private Date articleTime;
 
     /**
      * 文章阅读量

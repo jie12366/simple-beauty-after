@@ -2,6 +2,7 @@ package ncu.soft.blog.controller.user;
 
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.UsersInfo;
+import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.EmailService;
 import ncu.soft.blog.service.UploadService;
 import ncu.soft.blog.service.UsersInfoService;
@@ -42,6 +43,7 @@ public class InfoController {
 
     @ApiOperation("根据uid获取用户信息")
     @GetMapping("/users/{uid}")
+    @LoginToken
     public JsonResult getUsersById(@Valid @PathVariable String uid){
         UsersInfo usersInfo = usersInfoService.findByUid(Integer.parseInt(uid));
         return JsonResult.success(usersInfo);
@@ -49,6 +51,7 @@ public class InfoController {
 
     @ApiOperation("更换头像")
     @PutMapping("/headPath")
+    @LoginToken
     public JsonResult uploadImage(HttpServletRequest request, @RequestParam("image") MultipartFile image,@RequestParam("uid") int uid) throws IOException {
         String path = uploadService.getPath(request,image);
         usersInfoService.updateHeadPath(path,uid);
@@ -57,6 +60,7 @@ public class InfoController {
 
     @ApiOperation("发送邮箱验证码")
     @PostMapping("/emailCaptcha")
+    @LoginToken
     public JsonResult sendEmailCaptcha(@Valid @RequestParam("email") String email){
         String code = GetString.getCode();
         StringBuilder html = new StringBuilder();
@@ -74,6 +78,7 @@ public class InfoController {
 
     @ApiOperation("绑定邮箱")
     @PutMapping("/email")
+    @LoginToken
     public JsonResult bindEmail(@Valid @RequestParam("email") String email, @RequestParam("uid") int uid){
         usersInfoService.bindEmail(email,uid);
         return JsonResult.success(email);
@@ -81,6 +86,7 @@ public class InfoController {
 
     @ApiOperation("检查昵称是否被用过")
     @PostMapping("/nickname")
+    @LoginToken
     public JsonResult checkNickname(@Valid @RequestParam("nickname") String nickname){
         if (usersInfoService.checkNickname(nickname)){
             return JsonResult.failure(ResultCode.DATA_ALREADY_EXISTED);
@@ -91,6 +97,7 @@ public class InfoController {
 
     @ApiOperation("更新昵称和个人简介")
     @PutMapping("/usersInfo")
+    @LoginToken
     public JsonResult updateInfo(@Valid @RequestParam("nickname") String nickname,
                                  @RequestParam("introduction") String introduction, @RequestParam("uid") int uid){
         usersInfoService.updateInfo(nickname,introduction,uid);

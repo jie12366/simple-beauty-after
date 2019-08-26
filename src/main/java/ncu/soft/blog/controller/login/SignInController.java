@@ -66,8 +66,8 @@ public class SignInController {
             Users users1 = userService.findByAccount(users.getUAccount());
             //利用JWT生成token
             String token = JwtUtil.generateToken(users1);
-            //将md5加密的密文作为redis的键
-            String key = GetString.getMd5(users.getUPwd());
+            //将生成的token的签证作为redis的键
+            String key = token.split("\\.")[2];
             //将token存入redis并设置过期时间为1小时
             valueOperations.set(key,token,1,TimeUnit.HOURS);
             return JsonResult.success(token);

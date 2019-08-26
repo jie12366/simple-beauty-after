@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.Resource;
+
 /**
  * @author www.xyjz123.xyz
  * @description
@@ -21,7 +23,7 @@ import org.springframework.util.ReflectionUtils;
 @Component
 public class SaveEventListener extends AbstractMongoEventListener<Object> {
 
-    @Autowired
+    @Resource(name = "mongoTemplate")
     MongoTemplate mongo;
 
     @Override

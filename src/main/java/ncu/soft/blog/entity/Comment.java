@@ -20,10 +20,9 @@ import java.util.List;
 public class Comment {
 
     /**
-     * 评论者的用户信息
+     * 评论者的用户id
      */
-    @Field("uInfo")
-    private UsersInfo usersInfo;
+    private int uid;
 
     /**
      * 评论的发表时间

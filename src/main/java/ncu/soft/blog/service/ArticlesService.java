@@ -1,6 +1,7 @@
 package ncu.soft.blog.service;
 
 import ncu.soft.blog.entity.Article;
+import org.springframework.data.domain.PageImpl;
 
 /**
  * @author www.xyjz123.xyz
@@ -15,4 +16,12 @@ public interface ArticlesService {
      * @return 返回存入的对象
      */
     Article save(Article article);
+
+    /**
+     * 分页查询所有数据
+     * @param pageIndex 当前页
+     * @param pageSize 每页大小
+     * @return PageImpl
+     */
+    PageImpl<Article> getArticlesByPage(int pageIndex,int pageSize);
 }

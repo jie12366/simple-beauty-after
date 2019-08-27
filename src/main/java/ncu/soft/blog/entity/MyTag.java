@@ -7,47 +7,40 @@ import ncu.soft.blog.selfAnnotation.AutoIncKey;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author www.xyjz123.xyz
  * @description
- * @date 2019/8/13 14:38
+ * @date 2019/8/26 19:58
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "comment")
-public class Comment {
+@Document(collection = "my_tag")
+public class MyTag {
 
     /**
-     * Comment的主键
+     * myTag的主键
      */
     @AutoIncKey
     @Id
     private int id;
 
     /**
-     * 评论者的用户id
+     * 用户id
      */
     @Indexed
     private int uid;
 
     /**
-     * 评论的发表时间
+     * 用户的个人标签(不能重复)
      */
-    private String cTime;
+    private Set<String> tags;
 
     /**
-     * 评论内容
+     * 用户的个人分类(不能重复)
      */
-    private String content;
-
-    /**
-     * 评论回复列表
-     */
-    @Field("rComments")
-    private List<ReplyComment> replyComments;
+    private Set<String> categorys;
 }

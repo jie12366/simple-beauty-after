@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ncu.soft.blog.selfAnnotation.AutoIncKey;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -29,6 +30,7 @@ public class UsersInfo {
     /**
      * 用户id
      */
+    @Indexed
     private int uid;
 
     /**
@@ -49,7 +51,6 @@ public class UsersInfo {
     /**
      * 我的个人介绍
      */
-    @Field("dec")
     private String introduction;
 
     /**

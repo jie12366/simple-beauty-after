@@ -4,27 +4,23 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
+import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.selfAnnotation.LoginToken;
-import ncu.soft.blog.service.ArticlesService;
-import ncu.soft.blog.service.DetailService;
-import ncu.soft.blog.service.UploadService;
+import ncu.soft.blog.service.*;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.RemoveHtmlTags;
 import ncu.soft.blog.utils.ResultCode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author www.xyjz123.xyz
@@ -36,6 +32,12 @@ public class WriterController {
 
     @Resource
     UploadService uploadService;
+
+    @Resource
+    UsersInfoService usersInfoService;
+
+    @Resource
+    TagService tagService;
 
     @Resource
     ArticlesService articlesService;
@@ -57,12 +59,14 @@ public class WriterController {
     public JsonResult saveArticles(@Valid @RequestParam("uid") int uid, @RequestParam("title") String title,
                                    @RequestParam("category") String category, @RequestParam("tags") String tags,
                                    @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml){
-        Article article = new Article();
         // 解析json字符串为list集合
         List<String> tags1 = JSON.parseArray(tags,String.class);
 
-        //去除html标签和空格，取前150字为文章摘要
-        String summary = RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,150);
+        MyTag myTag = tagService.findByUid(uid);
+        addTag(myTag,tags1,category,uid);
+
+        //去除html标签和空格，取前80字为文章摘要
+        String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,80) + "...";
 
         String coverPath = "";
 
@@ -75,16 +79,10 @@ public class WriterController {
             coverPath = elements.get(0).attr("src");
         }
 
-        article.setUid(uid);
-        article.setCategory(category);
-        article.setTags(tags1);
-        article.setSummary(summary);
-        article.setCoverPath(coverPath);
-        article.setArticleTime(new Date());
-        article.setTitle(title);
-        article.setReads(0);
-        article.setLikes(0);
-        article.setComments(0);
+        // 获取用户昵称
+        String nickname = usersInfoService.findByUid(uid).getNickName();
+
+        Article article = new Article(uid,nickname,category,tags1,coverPath,title,summary,new Date(),0,0,0);
         // 保存文章信息并返回
         Article article1 = articlesService.save(article);
 
@@ -102,6 +100,50 @@ public class WriterController {
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.SAVE_ERROR);
+        }
+    }
+
+    @ApiOperation("获取用户所有个人分类")
+    @GetMapping("/categorys/{uid}")
+    @LoginToken
+    public JsonResult getCategorys(@Valid @PathVariable("uid") int uid){
+        MyTag myTag = tagService.findByUid(uid);
+        if (myTag != null){
+            return JsonResult.success(myTag.getCategorys());
+        }else {
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }
+    }
+
+    /**
+     * 将新加的分类和标签添加到数据库
+     * @param myTag MyTag
+     * @param tags1 标签
+     * @param category 分类
+     * @param uid 用户id
+     */
+    private void addTag(MyTag myTag,List<String > tags1,String category,int uid){
+        //如果数据为空，则存入数据
+        if(myTag == null){
+            MyTag myTag1 = new MyTag();
+            myTag1.setTags(new HashSet<>(tags1));
+            Set<String > categorys = new HashSet<>();
+
+            categorys.add(category);
+            myTag1.setCategorys(categorys);
+            myTag1.setUid(uid);
+            tagService.save(myTag1);
+        }
+        //如果数据不为空，则更新数据
+        else {
+            Set<String > tags2 = myTag.getTags();
+            tags2.addAll(tags1);
+            myTag.setTags(tags2);
+
+            Set<String > categorys = myTag.getCategorys();
+            categorys.add(category);
+            myTag.setCategorys(categorys);
+            tagService.update(myTag);
         }
     }
 }

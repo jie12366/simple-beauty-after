@@ -25,6 +25,7 @@ public class ReplyComment {
     /**
      * 回复的目标用户昵称
      */
+    @Field("toName")
     private int toNickname;
 
     /**

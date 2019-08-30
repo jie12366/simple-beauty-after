@@ -43,10 +43,13 @@ public class InfoController {
 
     @ApiOperation("根据uid获取用户信息")
     @GetMapping("/users/{uid}")
-    @LoginToken
     public JsonResult getUsersById(@Valid @PathVariable String uid){
         UsersInfo usersInfo = usersInfoService.findByUid(Integer.parseInt(uid));
-        return JsonResult.success(usersInfo);
+        if (usersInfo != null){
+            return JsonResult.success(usersInfo);
+        }else {
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }
     }
 
     @ApiOperation("更换头像")
@@ -54,8 +57,11 @@ public class InfoController {
     @LoginToken
     public JsonResult uploadImage(HttpServletRequest request, @RequestParam("image") MultipartFile image,@RequestParam("uid") int uid) throws IOException {
         String path = uploadService.getPath(request,image);
-        usersInfoService.updateHeadPath(path,uid);
-        return JsonResult.success(path);
+        if(usersInfoService.updateHeadPath(path,uid) != null){
+            return JsonResult.success(path);
+        }else {
+            return JsonResult.failure(ResultCode.UPDATE_ERROR);
+        }
     }
 
     @ApiOperation("发送邮箱验证码")
@@ -80,15 +86,17 @@ public class InfoController {
     @PutMapping("/email")
     @LoginToken
     public JsonResult bindEmail(@Valid @RequestParam("email") String email, @RequestParam("uid") int uid){
-        usersInfoService.bindEmail(email,uid);
-        return JsonResult.success(email);
+        if (usersInfoService.bindEmail(email,uid) != null){
+            return JsonResult.success(email);
+        }else {
+            return JsonResult.failure(ResultCode.UPDATE_ERROR);
+        }
     }
 
     @ApiOperation("检查昵称是否被用过")
     @PostMapping("/nickname")
-    @LoginToken
     public JsonResult checkNickname(@Valid @RequestParam("nickname") String nickname){
-        if (usersInfoService.checkNickname(nickname)){
+        if (usersInfoService.checkNickname(nickname) != null){
             return JsonResult.failure(ResultCode.DATA_ALREADY_EXISTED);
         }else {
             return JsonResult.success();
@@ -100,7 +108,10 @@ public class InfoController {
     @LoginToken
     public JsonResult updateInfo(@Valid @RequestParam("nickname") String nickname,
                                  @RequestParam("introduction") String introduction, @RequestParam("uid") int uid){
-        usersInfoService.updateInfo(nickname,introduction,uid);
-        return JsonResult.success();
+        if (usersInfoService.updateInfo(nickname,introduction,uid) != null){
+            return JsonResult.success();
+        }else {
+            return JsonResult.failure(ResultCode.UPDATE_ERROR);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package ncu.soft.blog.service;
 
 import ncu.soft.blog.entity.Article;
+import ncu.soft.blog.entity.ArticleDetail;
 import org.springframework.data.domain.PageImpl;
 
 /**
@@ -24,4 +25,27 @@ public interface ArticlesService {
      * @return PageImpl
      */
     PageImpl<Article> getArticlesByPage(int pageIndex,int pageSize);
+
+    /**
+     * 根据用户id分页查询数据
+     * @param pageIndex 当前页
+     * @param pageSize 每页大小
+     * @param uid 用户id
+     * @return PageImpl<Article>
+     */
+    PageImpl<Article> getArticlesByUidByPage(int pageIndex,int pageSize,int uid);
+
+    /**
+     * 根据文章id获取文章内容
+     * @param aid 文章id
+     * @return 文章内容
+     */
+    ArticleDetail getArticleByAid(int aid);
+
+    /**
+     * 根据aid获取文章数据
+     * @param aid 文章id
+     * @return Article
+     */
+    Article getArticle(int aid);
 }

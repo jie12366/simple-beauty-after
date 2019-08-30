@@ -20,28 +20,29 @@ public interface UsersInfoService {
      * 将用户信息插入数据库
      * @param usersInfo 用户信息
      */
-    void save(UsersInfo usersInfo);
+    UsersInfo save(UsersInfo usersInfo);
 
     /**
      * 更换用户头像
      * @param headPath 头像路径
      * @param uid 用户id
+     * @return 更新后的用户数据
      */
-    void updateHeadPath(String headPath,int uid);
+    UsersInfo updateHeadPath(String headPath,int uid);
 
     /**
      * 给指定的用户绑定邮箱
      * @param email 要绑定的邮箱
      * @param uid 用户id
      */
-    void bindEmail(String email,int uid);
+    UsersInfo bindEmail(String email,int uid);
 
     /**
      * 检查昵称是否被用过
      * @param nickname 昵称
      * @return 是否被用过
      */
-    boolean checkNickname(String nickname);
+    UsersInfo checkNickname(String nickname);
 
     /**
      * 更新用户昵称和个人简介
@@ -49,5 +50,12 @@ public interface UsersInfoService {
      * @param introduction  个人简介
      * @param uid 用户id
      */
-    void updateInfo(String nickname,String introduction,int uid);
+    UsersInfo updateInfo(String nickname,String introduction,int uid);
+
+    /**
+     * 按指定的数字更新文章数
+     * @param articles 文章数(1或-1)
+     * @param uid 用户id
+     */
+    void updateArticles(int articles,int uid);
 }

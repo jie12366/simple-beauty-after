@@ -4,6 +4,7 @@ import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.service.UserService;
 import ncu.soft.blog.utils.GetString;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,27 +27,18 @@ public class UserServiceImpl implements UserService {
     MongoTemplate mongoTemplate;
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#id")
     public Users findById(int id){
         return mongoTemplate.findById(id,Users.class);
     }
 
     @Override
-    @Cacheable
     public Users findByAccount(String account) {
         return mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(account)),Users.class);
     }
 
     @Override
-    @Cacheable
-    public boolean isExist(String account) {
-        return (mongoTemplate.findOne(
-                new Query(Criteria.where("uAccount").
-                        is(account)),Users.class) != null);
-    }
-
-    @Override
-    @CachePut
+    @CachePut(key = "#users.id")
     public Users save(Users users) {
         String secret = GetString.getMd5(users.getUPwd());
         users.setUPwd(secret);
@@ -54,15 +46,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable
-    public boolean verifyUser(Users users) {
+    public Users verifyUser(Users users) {
         String secret = GetString.getMd5(users.getUPwd());
-        Users users1 = mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(users.getUAccount())
+       return mongoTemplate.findOne(new Query(Criteria.where("uAccount").is(users.getUAccount())
                 .and("uPwd").is(secret)),Users.class);
-        if (users1 != null){
-            return true;
-        }else {
-            return false;
-        }
     }
 }

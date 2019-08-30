@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
+
 /**
  * @author www.xyjz123.xyz
  * @description
@@ -18,8 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "article_detail")
-public class ArticleDetail {
+public class ArticleDetail implements Serializable {
 
+    private static final long serialVersionUID = 8948260579774224506L;
     /**
      * 主键
      */

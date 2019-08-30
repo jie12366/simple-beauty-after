@@ -24,13 +24,6 @@ public interface UserService {
     Users findByAccount(String account);
 
     /**
-     * 检查账号是否存在
-     * @param account 账号
-     * @return 是否存在
-     */
-    boolean isExist(String account);
-
-    /**
      * 保存users到数据库
      * @param users Users
      * @return 返回user信息
@@ -42,5 +35,5 @@ public interface UserService {
      * @param users Users
      * @return 是否匹配
      */
-    boolean verifyUser(Users users);
+    Users verifyUser(Users users);
 }

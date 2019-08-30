@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,8 +21,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "comment")
-public class Comment {
+public class Comment implements Serializable {
 
+    private static final long serialVersionUID = -7237665666204550844L;
     /**
      * Comment的主键
      */

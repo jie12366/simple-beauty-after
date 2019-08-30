@@ -27,5 +27,5 @@ public interface TagService {
      * 更新数据
      * @param myTag MyTag
      */
-    void update(MyTag myTag);
+    MyTag update(MyTag myTag);
 }

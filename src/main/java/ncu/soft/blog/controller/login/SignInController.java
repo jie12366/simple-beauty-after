@@ -50,7 +50,7 @@ public class SignInController {
     @ApiOperation("检查账号是否存在")
     @PostMapping("/account")
     public JsonResult checkAccount(@Valid @RequestParam("account") String account){
-        if (userService.isExist(account)){
+        if (userService.findByAccount(account) != null){
             return JsonResult.success(ResultCode.USER_HAS_EXISTED);
         }else{
             return JsonResult.failure(ResultCode.USER_NOT_EXIST);
@@ -60,7 +60,7 @@ public class SignInController {
     @ApiOperation("账号登录")
     @PostMapping("/login")
     public JsonResult login(@Valid @RequestBody Users users){
-        if (!userService.verifyUser(users)){
+        if (userService.verifyUser(users) == null){
             return JsonResult.failure(ResultCode.USER_LOGIN_ERROR);
         }else {
             Users users1 = userService.findByAccount(users.getUAccount());
@@ -77,7 +77,7 @@ public class SignInController {
     @ApiOperation("账号注销")
     @DeleteMapping("/logout")
     public JsonResult logout(@Valid @RequestParam("account")String account){
-        if (!userService.isExist(account)){
+        if (userService.findByAccount(account) == null){
             return JsonResult.failure(ResultCode.USER_NOT_EXIST);
         }else {
             //删除token

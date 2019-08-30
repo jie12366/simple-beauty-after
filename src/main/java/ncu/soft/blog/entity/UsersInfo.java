@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
+
 /**
  * @author www.xyjz123.xyz
  * @description
@@ -18,8 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "users_info")
-public class UsersInfo {
+public class UsersInfo implements Serializable {
 
+    private static final long serialVersionUID = -1391733975883260032L;
     /**
      *主键
      */
@@ -73,4 +76,26 @@ public class UsersInfo {
      * 我收获的喜欢
      */
     private int likes;
+
+    /**
+     * 我的浏览量
+     */
+    private int reads;
+
+    /**
+     * 我的文章
+     */
+    private int articles;
+
+    public UsersInfo(int uid, String nickName, String phone, String headPath, int attentions, int fans, int likes, int reads, int articles) {
+        this.uid = uid;
+        this.nickName = nickName;
+        this.phone = phone;
+        this.headPath = headPath;
+        this.attentions = attentions;
+        this.fans = fans;
+        this.likes = likes;
+        this.reads = reads;
+        this.articles = articles;
+    }
 }

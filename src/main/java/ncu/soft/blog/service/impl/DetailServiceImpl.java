@@ -22,7 +22,7 @@ public class DetailServiceImpl implements DetailService {
     MongoTemplate template;
 
     @Override
-    @CachePut
+    @CachePut(key = "#articleDetail.aid")
     public ArticleDetail save(ArticleDetail articleDetail) {
         return template.insert(articleDetail);
     }

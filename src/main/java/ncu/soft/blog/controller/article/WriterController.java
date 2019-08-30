@@ -57,19 +57,19 @@ public class WriterController {
     @PostMapping("/articles")
     @LoginToken
     public JsonResult saveArticles(@Valid @RequestParam("uid") int uid, @RequestParam("title") String title,
-                                   @RequestParam("category") String category, @RequestParam("tags") String tags,
+                                   @RequestParam("category") String category, @RequestParam("tags") String tags,@RequestParam("pwd")String pwd,
                                    @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml){
         // 解析json字符串为list集合
         List<String> tags1 = JSON.parseArray(tags,String.class);
 
         MyTag myTag = tagService.findByUid(uid);
+        //存入或更新标签（分类）
         addTag(myTag,tags1,category,uid);
 
-        //去除html标签和空格，取前80字为文章摘要
-        String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,80) + "...";
+        //去除html标签和空格，取前70字为文章摘要
+        String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,70) + "...";
 
         String coverPath = "";
-
         // 利用jsoup解析html字符串
         Document doc = Jsoup.parse(contentHtml);
         // 获取所有图片标签
@@ -81,10 +81,12 @@ public class WriterController {
 
         // 获取用户昵称
         String nickname = usersInfoService.findByUid(uid).getNickName();
-
-        Article article = new Article(uid,nickname,category,tags1,coverPath,title,summary,new Date(),0,0,0);
+        Article article = new Article(uid,nickname,category,tags1,coverPath,title,summary,new Date(),pwd,0,0,0);
         // 保存文章信息并返回
         Article article1 = articlesService.save(article);
+
+        //文章数加1
+        usersInfoService.updateArticles(1,uid);
 
         if (article1 == null){
             // 保存数据错误
@@ -126,22 +128,40 @@ public class WriterController {
         //如果数据为空，则存入数据
         if(myTag == null){
             MyTag myTag1 = new MyTag();
-            myTag1.setTags(new HashSet<>(tags1));
-            Set<String > categorys = new HashSet<>();
+            Map<String ,Integer> map = new HashMap<>(30);
+            //将标签分别存入，并置初始值为1
+            for (String tag : tags1){
+                map.put(tag,1);
+            }
+            myTag1.setTags(map);
 
-            categorys.add(category);
+            Map<String ,Integer> categorys = new HashMap<>(20);
+            categorys.put(category,1);
             myTag1.setCategorys(categorys);
             myTag1.setUid(uid);
             tagService.save(myTag1);
         }
         //如果数据不为空，则更新数据
         else {
-            Set<String > tags2 = myTag.getTags();
-            tags2.addAll(tags1);
+            Map<String ,Integer> tags2 = myTag.getTags();
+            for (String tag : tags1){
+                //如果存在键，则更新值
+                if (tags2.containsKey(tag)){
+                    tags2.put(tag,tags2.get(tag) + 1);
+                }
+                //如果不存在，则存入键值
+                else {
+                    tags2.put(tag,1);
+                }
+            }
             myTag.setTags(tags2);
 
-            Set<String > categorys = myTag.getCategorys();
-            categorys.add(category);
+            Map<String ,Integer> categorys = myTag.getCategorys();
+            if (categorys.containsKey(category)){
+                categorys.put(category, categorys.get(category) + 1);
+            }else {
+                categorys.put(category,1);
+            }
             myTag.setCategorys(categorys);
             tagService.update(myTag);
         }

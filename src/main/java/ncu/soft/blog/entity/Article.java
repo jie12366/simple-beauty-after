@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -20,8 +21,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "article")
-public class Article {
+public class Article implements Serializable {
 
+    private static final long serialVersionUID = -6473494395860839879L;
     /**
      * article的主键
      */
@@ -72,6 +74,11 @@ public class Article {
     private Date articleTime;
 
     /**
+     * 文章口令(公开文章口令为空)
+     */
+    private String pwd;
+
+    /**
      * 文章阅读量
      */
     private int reads;
@@ -87,7 +94,7 @@ public class Article {
     private int comments;
 
     public Article(int uid, String uNickname, String category, List<String> tags, String coverPath,
-                   String title, String summary, Date articleTime, int reads, int likes, int comments) {
+                   String title, String summary, Date articleTime,String pwd, int reads, int likes, int comments) {
         this.uid = uid;
         this.uNickname = uNickname;
         this.category = category;
@@ -96,6 +103,7 @@ public class Article {
         this.title = title;
         this.summary = summary;
         this.articleTime = articleTime;
+        this.pwd = pwd;
         this.reads = reads;
         this.likes = likes;
         this.comments = comments;

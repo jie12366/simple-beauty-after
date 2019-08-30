@@ -3,8 +3,10 @@ package ncu.soft.blog.service.impl;
 import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.TagService;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,22 +28,22 @@ public class TagServiceImpl implements TagService {
     MongoTemplate mongoTemplate;
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#uid")
     public MyTag findByUid(int uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
     }
 
     @Override
-    @CachePut
+    @CachePut(key = "#tag.uid")
     public MyTag save(MyTag tag) {
         return mongoTemplate.insert(tag);
     }
 
     @Override
-    @CachePut
-    public void update(MyTag tag) {
+    @CacheEvict(key = "#tag.uid")
+        public MyTag update(MyTag tag) {
         Query query = new Query(Criteria.where("uid").is(tag.getUid()));
         Update update = Update.update("tags",tag.getTags()).set("categorys",tag.getCategorys());
-        mongoTemplate.updateFirst(query,update,MyTag.class);
+        return mongoTemplate.findAndModify(query,update,new FindAndModifyOptions().returnNew(true), MyTag.class);
     }
 }

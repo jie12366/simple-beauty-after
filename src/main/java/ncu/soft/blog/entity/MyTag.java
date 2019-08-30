@@ -8,7 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -19,8 +20,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "my_tag")
-public class MyTag {
+public class MyTag implements Serializable {
 
+    private static final long serialVersionUID = 3204511066736409881L;
     /**
      * myTag的主键
      */
@@ -35,12 +37,12 @@ public class MyTag {
     private int uid;
 
     /**
-     * 用户的个人标签(不能重复)
+     * 用户的个人标签与标签对应的文章数
      */
-    private Set<String> tags;
+    private Map<String,Integer> tags;
 
     /**
-     * 用户的个人分类(不能重复)
+     * 用户的个人分类与分类对应的文章数
      */
-    private Set<String> categorys;
+    private Map<String,Integer> categorys;
 }

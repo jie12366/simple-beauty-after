@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,10 +33,10 @@ public class BlogApplicationTests {
     ValueOperations<String, Object> valueOperations;
 
     @Test
-    public void testRedis() {
-        Users users = new Users("133","123");
-        valueOperations.set("user",users,10,TimeUnit.MINUTES);
-
-        System.out.println("getUser" + valueOperations.get("user"));
+    public void testFindAndModify() {
+        Query query = new Query(Criteria.where("uid").is(11));
+        Update update = Update.update("email","2263509062@qq.com");
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+        System.out.println(mongoTemplate.findAndModify(query,update,options,UsersInfo.class));
     }
 }

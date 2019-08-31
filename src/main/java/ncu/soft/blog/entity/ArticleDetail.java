@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -47,4 +49,9 @@ public class ArticleDetail implements Serializable {
      */
     @Field("cMd")
     private String contentMd;
+
+    /**
+     * 文章目录
+     */
+    private List<Map<String ,String >> directory;
 }

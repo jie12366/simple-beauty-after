@@ -15,4 +15,11 @@ public interface DetailService {
      * @param articleDetail 文章内容
      */
     ArticleDetail save(ArticleDetail articleDetail);
+
+    /**
+     * 根据文章id获取文章内容
+     * @param aid 文章id
+     * @return 文章内容
+     */
+    ArticleDetail getArticleByAid(int aid);
 }

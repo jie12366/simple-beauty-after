@@ -16,7 +16,7 @@ public interface ArticlesService {
      * @param article Article
      * @return 返回存入的对象
      */
-    Article save(Article article);
+    Article save(Article article,String contentHtml);
 
     /**
      * 分页查询所有数据
@@ -36,16 +36,15 @@ public interface ArticlesService {
     PageImpl<Article> getArticlesByUidByPage(int pageIndex,int pageSize,int uid);
 
     /**
-     * 根据文章id获取文章内容
-     * @param aid 文章id
-     * @return 文章内容
-     */
-    ArticleDetail getArticleByAid(int aid);
-
-    /**
      * 根据aid获取文章数据
      * @param aid 文章id
      * @return Article
      */
     Article getArticle(int aid);
+
+    /**
+     * 阅读量+1
+     * @return 更新后的对象
+     */
+    Article updateReads(int aid);
 }

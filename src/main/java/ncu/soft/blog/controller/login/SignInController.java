@@ -3,16 +3,16 @@ package ncu.soft.blog.controller.login;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.ImageCode;
 import ncu.soft.blog.entity.Users;
-import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.UserService;
-import ncu.soft.blog.utils.*;
+import ncu.soft.blog.utils.CreateImageCode;
+import ncu.soft.blog.utils.JsonResult;
+import ncu.soft.blog.utils.JwtUtil;
+import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -68,8 +68,8 @@ public class SignInController {
             String token = JwtUtil.generateToken(users1);
             //将生成的token的签证作为redis的键
             String key = token.split("\\.")[2];
-            //将token存入redis并设置过期时间为1小时
-            valueOperations.set(key,token,1,TimeUnit.HOURS);
+            //将token存入redis并设置过期时间为5小时
+            valueOperations.set(key,token,5,TimeUnit.HOURS);
             return JsonResult.success(token);
         }
     }

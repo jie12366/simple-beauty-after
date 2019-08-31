@@ -108,4 +108,12 @@ public class Article implements Serializable {
         this.likes = likes;
         this.comments = comments;
     }
+
+    public Article(int uid, String category, List<String> tags, String title, String pwd) {
+        this.uid = uid;
+        this.category = category;
+        this.tags = tags;
+        this.title = title;
+        this.pwd = pwd;
+    }
 }

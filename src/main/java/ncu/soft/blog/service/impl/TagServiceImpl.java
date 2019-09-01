@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -28,22 +30,24 @@ public class TagServiceImpl implements TagService {
     MongoTemplate mongoTemplate;
 
     @Override
-    @Cacheable(key = "#uid")
     public MyTag findByUid(int uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
     }
 
     @Override
-    @CachePut(key = "#tag.uid")
     public MyTag save(MyTag tag) {
         return mongoTemplate.insert(tag);
     }
 
     @Override
-    @CacheEvict(key = "#tag.uid")
         public MyTag update(MyTag tag) {
         Query query = new Query(Criteria.where("uid").is(tag.getUid()));
         Update update = Update.update("tags",tag.getTags()).set("categorys",tag.getCategorys());
         return mongoTemplate.findAndModify(query,update,new FindAndModifyOptions().returnNew(true), MyTag.class);
+    }
+
+    @Override
+    public MyTag getAllTags(int uid) {
+        return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
     }
 }

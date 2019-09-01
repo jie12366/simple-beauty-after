@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -49,7 +50,7 @@ public class Article implements Serializable {
     /**
      * 文章的标签
      */
-    private List<String> tags;
+    private List<Map<String ,String >> tags;
 
     /**
      * 文章的封面图片路径
@@ -93,7 +94,7 @@ public class Article implements Serializable {
      */
     private int comments;
 
-    public Article(int uid, String uNickname, String category, List<String> tags, String coverPath,
+    public Article(int uid, String uNickname, String category, List<Map<String ,String >> tags, String coverPath,
                    String title, String summary, Date articleTime,String pwd, int reads, int likes, int comments) {
         this.uid = uid;
         this.uNickname = uNickname;
@@ -109,7 +110,7 @@ public class Article implements Serializable {
         this.comments = comments;
     }
 
-    public Article(int uid, String category, List<String> tags, String title, String pwd) {
+    public Article(int uid, String category, List<Map<String ,String >> tags, String title, String pwd) {
         this.uid = uid;
         this.category = category;
         this.tags = tags;

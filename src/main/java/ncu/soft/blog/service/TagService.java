@@ -28,4 +28,11 @@ public interface TagService {
      * @param myTag MyTag
      */
     MyTag update(MyTag myTag);
+
+    /**
+     * 获取用户的所有标签
+     * @param  uid 用户id
+     * @return List<Map<String,Integer>>
+     */
+    MyTag getAllTags(int uid);
 }

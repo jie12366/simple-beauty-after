@@ -47,4 +47,14 @@ public interface ArticlesService {
      * @return 更新后的对象
      */
     Article updateReads(int aid);
+
+    /**
+     * 获取用户指定标签的文章
+     * @param index 当前页
+     * @param size 每页大小
+     * @param uid 用户id
+     * @param tag 文章标签
+     * @return PageImpl
+     */
+    PageImpl<Article> getArticleByTag(int index,int size,int uid,String tag);
 }

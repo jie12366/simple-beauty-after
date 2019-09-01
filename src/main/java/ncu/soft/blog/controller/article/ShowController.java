@@ -3,8 +3,10 @@ package ncu.soft.blog.controller.article;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
+import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.DetailService;
+import ncu.soft.blog.service.TagService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,9 @@ public class ShowController {
 
     @Resource
     DetailService detailService;
+
+    @Resource
+    TagService tagService;
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -67,6 +72,29 @@ public class ShowController {
             return JsonResult.success(article);
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }
+    }
+
+    @ApiOperation("获取我的所有标签")
+    @GetMapping("/tags/{uid}")
+    public JsonResult getAllTags(@Valid @PathVariable("uid") int uid){
+        MyTag myTag = tagService.getAllTags(uid);
+        if (myTag == null){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(myTag.getTags());
+        }
+    }
+
+    @ApiOperation("根据我的标签获取所有文章")
+    @GetMapping("/articles/{uid}/{tag}/{index}/{size}")
+    public JsonResult getArticlesByTag(@Valid @PathVariable("uid")int uid,@PathVariable("tag")String  tag,
+                                       @PathVariable("index")int index,@PathVariable("size")int size){
+        List<Article> articles = articlesService.getArticleByTag(index,size,uid,tag).getContent();
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(articles);
         }
     }
 }

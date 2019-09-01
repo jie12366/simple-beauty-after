@@ -16,7 +16,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -57,7 +60,13 @@ public class WriterController {
                                    @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml){
         // 解析json字符串为list集合
         List<String> tags1 = JSON.parseArray(tags,String.class);
-        Article article = new Article(uid,category,tags1,title,pwd);
+        List<Map<String ,String >> tagList = new ArrayList<>();
+        for (String tag: tags1){
+            Map<String ,String > tagMap = new HashMap<>(3);
+            tagMap.put("tag",tag);
+            tagList.add(tagMap);
+        }
+        Article article = new Article(uid,category,tagList,title,pwd);
         // 保存文章信息并返回
         Article article1 = articlesService.save(article,contentHtml);
 

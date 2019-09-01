@@ -7,10 +7,9 @@ import ncu.soft.blog.selfAnnotation.AutoIncKey;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
 
 /**
  * @author www.xyjz123.xyz
@@ -32,24 +31,47 @@ public class Comment implements Serializable {
     private int id;
 
     /**
+     * 文章id
+     */
+    private int aid;
+
+    /**
      * 评论者的用户id
      */
     @Indexed
     private int uid;
 
     /**
+     * 回复的目标id
+     */
+    private int rUid;
+
+    /**
+     * 回复的目标的内容
+     */
+    private String rContent;
+
+    /**
      * 评论的发表时间
      */
-    private String cTime;
+    private Date cTime;
 
     /**
      * 评论内容
      */
     private String content;
 
-    /**
-     * 评论回复列表
-     */
-    @Field("rComments")
-    private List<ReplyComment> replyComments;
+    public Comment(int aid,int uid, String content) {
+        this.aid = aid;
+        this.uid = uid;
+        this.content = content;
+    }
+
+    public Comment(int aid,int uid, int rUid, String content,String rContent) {
+        this.aid = aid;
+        this.uid = uid;
+        this.rUid = rUid;
+        this.content = content;
+        this.rContent = rContent;
+    }
 }

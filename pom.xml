@@ -134,6 +134,14 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.3</version>
         </dependency>
+
+        <!--huTool工具包-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.6.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

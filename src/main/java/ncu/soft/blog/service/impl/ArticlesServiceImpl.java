@@ -1,5 +1,6 @@
 package ncu.soft.blog.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.ArticlesService;
@@ -25,6 +26,8 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,9 +54,10 @@ public class ArticlesServiceImpl implements ArticlesService {
     @Override
     public Article save(Article article,String contentHtml) {
 
+        Date date = new Date();
         MyTag myTag = tagService.findByUid(article.getUid());
         //存入或更新标签（分类）
-        addTag(myTag,article.getTags(),article.getCategory(),article.getUid());
+        addTag(myTag,article.getTags(),article.getCategory(),article.getUid(),date);
 
         //去除html标签和空格，取前70字为文章摘要
         String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,70) + "...";
@@ -73,7 +77,7 @@ public class ArticlesServiceImpl implements ArticlesService {
         article.setSummary(summary);
         article.setCoverPath(coverPath);
         article.setUNickname(nickname);
-        article.setArticleTime(new Date());
+        article.setArticleTime(date);
         article.setReads(0);
         article.setLikes(0);
         article.setComments(0);
@@ -82,20 +86,14 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     @Override
     public PageImpl<Article> getArticlesByPage(int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex,pageSize);
         Query query = new Query().with(new Sort(Sort.Direction.DESC,"aTime"));
-        query.with(pageable);
-        List<Article> articles = mongoTemplate.find(query,Article.class);
-        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> 0);
+        return getArticles(pageIndex,pageSize,query);
     }
 
     @Override
     public PageImpl<Article> getArticlesByUidByPage(int pageIndex, int pageSize, int uid) {
-        Pageable pageable = PageRequest.of(pageIndex,pageSize);
         Query query = new Query(Criteria.where("uid").is(uid)).with(new Sort(Sort.Direction.DESC,"aTime"));
-        query.with(pageable);
-        List<Article> articles = mongoTemplate.find(query,Article.class);
-        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> 0);
+        return getArticles(pageIndex,pageSize,query);
     }
 
     @Override
@@ -115,13 +113,48 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     @Override
     public PageImpl<Article> getArticleByTag(int index, int size, int uid, String tag) {
-        Pageable pageable = PageRequest.of(index,size);
         // 通过elemMatch查询子文档
         Query query = new Query(Criteria.where("uid").is(uid).and("tags").elemMatch(Criteria.where("tag").is(tag)));
         query.with(new Sort(Sort.Direction.DESC,"aTime"));
+        return getArticles(index,size,query);
+    }
+
+    @Override
+    public PageImpl<Article> getArticleByCategory(int index, int size, int uid, String category) {
+        Query query = new Query(Criteria.where("uid").is(uid).and("category").is(category)).with(new Sort(Sort.Direction.DESC,"aTime"));
+        return getArticles(index,size,query);
+    }
+
+    @Override
+    public PageImpl<Article> getArticleByArchive(int index, int size, int uid, String archive) {
+        // 解析归档，获取年月
+        String[] date = archive.split("-");
+        String year = date[0];
+        int month = Integer.parseInt(date[1]);
+        // 获取下一个月
+        int endMonth = month + 1;
+        // 重组年月日，获取某个月的开始时间和截止时间
+        Date startDate = DateUtil.parse(year + "-" + month + "-01","yyyy-MM-dd");
+        // 因为iso时间要晚8个小时，所以结束时间是下个月月初的八点
+        Date endDate = DateUtil.parse(year + "-" + endMonth + "-01" + " 08","yyyy-MM-dd HH");
+        Query query = new Query(Criteria.where("uid").is(uid).and("aTime").gte(startDate).lte(endDate));
+        query.with(new Sort(Sort.Direction.DESC,"aTime"));
+        return getArticles(index,size,query);
+    }
+
+    /**
+     * 分页方法
+     * @param index 当前页
+     * @param size 每页大小
+     * @param query Query
+     * @return PageImpl<Article>
+     */
+    private PageImpl<Article> getArticles(int index, int size,Query query){
+        Pageable pageable = PageRequest.of(index,size);
         query.with(pageable);
+        long count = mongoTemplate.count(query,Article.class);
         List<Article> articles = mongoTemplate.find(query,Article.class);
-        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> 0);
+        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> count);
     }
 
     /**
@@ -131,20 +164,26 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param category 分类
      * @param uid 用户id
      */
-    private void addTag(MyTag myTag,List<Map<String ,String > > tags1,String category,int uid){
+    private void addTag(MyTag myTag,List<Map<String ,String > > tags1,String category,int uid, Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        String archive = sdf.format(date);
         //如果数据为空，则存入数据
         if(myTag == null){
             MyTag myTag1 = new MyTag();
-            Map<String ,Integer> map = new HashMap<>(30);
+            Map<String ,Integer> map = new HashMap<>(5);
             //将标签分别存入，并置初始值为1
             for (Map<String ,String > tag : tags1){
                 map.put(tag.get("tag"),1);
             }
             myTag1.setTags(map);
 
-            Map<String ,Integer> categorys = new HashMap<>(20);
+            Map<String ,Integer> categorys = new HashMap<>(2);
             categorys.put(category,1);
             myTag1.setCategorys(categorys);
+
+            Map<String ,Integer> archives = new HashMap<>(2);
+            archives.put(archive,1);
+            myTag1.setArchives(archives);
             myTag1.setUid(uid);
             tagService.save(myTag1);
         }
@@ -165,6 +204,7 @@ public class ArticlesServiceImpl implements ArticlesService {
             }
             myTag.setTags(tags2);
 
+            // 存入分类
             Map<String ,Integer> categorys = myTag.getCategorys();
             if (categorys.containsKey(category)){
                 categorys.put(category, categorys.get(category) + 1);
@@ -172,6 +212,15 @@ public class ArticlesServiceImpl implements ArticlesService {
                 categorys.put(category,1);
             }
             myTag.setCategorys(categorys);
+
+            // 存入归档
+            Map<String ,Integer> archives = myTag.getArchives();
+            if (archives.containsKey(archive)){
+                archives.put(archive, archives.get(archive) + 1);
+            }else {
+                archives.put(archive,1);
+            }
+            myTag.setArchives(archives);
             tagService.update(myTag);
         }
     }

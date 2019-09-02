@@ -2,6 +2,8 @@ package ncu.soft.blog.service;
 
 import ncu.soft.blog.entity.MyTag;
 
+import java.util.Map;
+
 /**
  * @author www.xyjz123.xyz
  * @description
@@ -35,4 +37,11 @@ public interface TagService {
      * @return List<Map<String,Integer>>
      */
     MyTag getAllTags(int uid);
+
+    /**
+     * 根据uid获取所有归档信息
+     * @param uid 用户id
+     * @return Map<String ,Integer>
+     */
+    Map<String ,Integer> getAllArchives(int uid);
 }

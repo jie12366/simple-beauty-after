@@ -45,4 +45,9 @@ public class MyTag implements Serializable {
      * 用户的个人分类与分类对应的文章数
      */
     private Map<String,Integer> categorys;
+
+    /**
+     * 用户的归档时间与对应的文章数
+     */
+    private Map<String,Integer> archives;
 }

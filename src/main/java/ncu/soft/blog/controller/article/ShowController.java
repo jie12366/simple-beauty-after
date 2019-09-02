@@ -1,6 +1,7 @@
 package ncu.soft.blog.controller.article;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
@@ -9,6 +10,7 @@ import ncu.soft.blog.service.DetailService;
 import ncu.soft.blog.service.TagService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author www.xyjz123.xyz
@@ -37,13 +40,13 @@ public class ShowController {
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
     public JsonResult getArticles(@Valid @PathVariable("index")int index,@PathVariable("size") int size){
-        return JsonResult.success(articlesService.getArticlesByPage(index, size).getContent());
+        return JsonResult.success(articlesService.getArticlesByPage(index, size));
     }
 
     @ApiOperation("我的主页分页展示我的文章")
     @GetMapping("/articles/{uid}/{index}/{size}")
     public JsonResult getArticlesByUid(@Valid @PathVariable("uid")int uid, @PathVariable("index")int index,@PathVariable("size") int size){
-        List<Article> articles = articlesService.getArticlesByUidByPage(index,size,uid).getContent();
+        PageImpl<Article> articles = articlesService.getArticlesByUidByPage(index,size,uid);
         if (!articles.isEmpty()){
             return JsonResult.success(articles);
         }else {
@@ -86,11 +89,46 @@ public class ShowController {
         }
     }
 
-    @ApiOperation("根据我的标签获取所有文章")
-    @GetMapping("/articles/{uid}/{tag}/{index}/{size}")
+    @ApiOperation("根据我的标签分页获取文章")
+    @GetMapping("/articles/{uid}/tag/{tag}/{index}/{size}")
     public JsonResult getArticlesByTag(@Valid @PathVariable("uid")int uid,@PathVariable("tag")String  tag,
                                        @PathVariable("index")int index,@PathVariable("size")int size){
-        List<Article> articles = articlesService.getArticleByTag(index,size,uid,tag).getContent();
+        PageImpl<Article> articles = articlesService.getArticleByTag(index,size,uid,tag);
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(articles);
+        }
+    }
+
+    @ApiOperation("根据我的分类分页获取文章")
+    @GetMapping("/articles/{uid}/category/{category}/{index}/{size}")
+    public JsonResult getArticlesByCategory(@Valid @PathVariable("uid")int uid,@PathVariable("category")String  category,
+                                       @PathVariable("index")int index,@PathVariable("size")int size){
+        PageImpl<Article> articles = articlesService.getArticleByCategory(index,size,uid,category);
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(articles);
+        }
+    }
+
+    @ApiOperation("获取我的所有归档")
+    @GetMapping("/archives/{uid}")
+    public JsonResult getAllArchives(@Valid @PathVariable("uid") int uid){
+        Map<String , Integer> archives = tagService.getAllArchives(uid);
+        if (archives == null){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(archives);
+        }
+    }
+
+    @ApiOperation("根据我的归档分页获取文章")
+    @GetMapping("/articles/{uid}/archive/{archive}/{index}/{size}")
+    public JsonResult getArticlesByDate(@Valid @PathVariable("uid")int uid,@PathVariable("archive")String  archive,
+                                            @PathVariable("index")int index,@PathVariable("size")int size){
+        PageImpl<Article> articles = articlesService.getArticleByArchive(index,size,uid,archive);
         if (articles.isEmpty()){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
         }else {

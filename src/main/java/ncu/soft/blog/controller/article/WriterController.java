@@ -93,7 +93,6 @@ public class WriterController {
 
     @ApiOperation("获取用户所有个人分类")
     @GetMapping("/categorys/{uid}")
-    @LoginToken
     public JsonResult getCategorys(@Valid @PathVariable("uid") int uid){
         MyTag myTag = tagService.findByUid(uid);
         if (myTag != null){

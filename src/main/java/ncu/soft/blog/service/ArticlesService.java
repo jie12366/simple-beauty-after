@@ -18,7 +18,12 @@ public interface ArticlesService {
      */
     Article save(Article article,String contentHtml,int aid);
 
-    void delete(int aid);
+    /**
+     * 删除文章数据
+     * @param aid 文章id
+     * @param uid 用户id
+     */
+    void delete(int aid,int uid);
 
     /**
      * 分页查询所有数据

@@ -25,6 +25,12 @@ public interface CommentService {
     Comment saveReply(Comment comment);
 
     /**
+     * 删除文章对应的评论
+     * @param aid 文章id
+     */
+    void delete(int aid);
+
+    /**
      * 根据aid分页获取评论数据
      * @param aid 文章id
      * @param index 当前页

@@ -46,6 +46,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public void delete(int aid) {
+        mongoTemplate.remove(new Query(Criteria.where("aid").is(aid)),Comment.class);
+    }
+
+    @Override
     @Cacheable(key = "#aid + '_' + #index + '_' + #size")
     public PageImpl<Comment> getCommentByPage(int aid,int index, int size) {
         Pageable pageable = PageRequest.of(index,size);

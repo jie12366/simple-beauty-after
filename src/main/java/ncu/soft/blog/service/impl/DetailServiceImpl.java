@@ -52,6 +52,11 @@ public class DetailServiceImpl implements DetailService {
     }
 
     @Override
+    public void delete(int aid) {
+        template.remove(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
+    }
+
+    @Override
     @Cacheable(key = "#aid")
     public ArticleDetail getArticleByAid(int aid) {
         return template.findOne(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);

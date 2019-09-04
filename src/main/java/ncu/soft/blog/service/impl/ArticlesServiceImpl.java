@@ -3,9 +3,7 @@ package ncu.soft.blog.service.impl;
 import cn.hutool.core.date.DateUtil;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.MyTag;
-import ncu.soft.blog.service.ArticlesService;
-import ncu.soft.blog.service.TagService;
-import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.service.*;
 import ncu.soft.blog.utils.RemoveHtmlTags;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,6 +45,12 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     @Resource
     UsersInfoService usersInfoService;
+
+    @Resource
+    CommentService commentService;
+
+    @Resource
+    DetailService detailService;
 
     @Resource
     TagService tagService;
@@ -91,7 +95,19 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public void delete(int aid) {
+    public void delete(int aid,int uid) {
+        // 更新文章数
+        usersInfoService.updateArticles(-1,uid);
+        // 更新标签、分类、归档
+        Article article = getArticle(aid);
+        MyTag myTag = tagService.findByUid(article.getUid());
+        String archive = DateUtil.format(article.getArticleTime(),"yyyy-MM");
+        removeTag(myTag,article.getTags(),article.getCategory(),archive);
+        // 删除文章对应的评论
+        commentService.delete(aid);
+        //删除文章详情
+        detailService.delete(aid);
+        // 删除文章数据
         mongoTemplate.remove(new Query(Criteria.where("id").is(aid)),Article.class);
     }
 
@@ -204,35 +220,77 @@ public class ArticlesServiceImpl implements ArticlesService {
             for (Map<String ,String > tag : tags1){
                 // 获取key
                 String tagKey = tag.get("tag");
-                //如果存在键，则更新值
-                if (tags2.containsKey(tagKey)){
-                    tags2.put(tagKey,tags2.get(tagKey) + 1);
-                }
-                //如果不存在，则存入键值
-                else {
-                    tags2.put(tagKey,1);
-                }
+                updateAddMap(tags2,tagKey);
             }
             myTag.setTags(tags2);
 
             // 存入分类
             Map<String ,Integer> categorys = myTag.getCategorys();
-            if (categorys.containsKey(category)){
-                categorys.put(category, categorys.get(category) + 1);
-            }else {
-                categorys.put(category,1);
-            }
+            updateAddMap(categorys,category);
             myTag.setCategorys(categorys);
 
             // 存入归档
             Map<String ,Integer> archives = myTag.getArchives();
-            if (archives.containsKey(archive)){
-                archives.put(archive, archives.get(archive) + 1);
-            }else {
-                archives.put(archive,1);
-            }
+            updateAddMap(archives,archive);
             myTag.setArchives(archives);
             tagService.update(myTag);
+        }
+    }
+
+    /**
+     * 移除标签、分类、归档
+     * @param myTag MyTag
+     * @param tags1 标签
+     * @param category 分类
+     * @param archive 归档
+     */
+    private void removeTag(MyTag myTag,List<Map<String ,String > > tags1,String category,String archive){
+        //移除标签
+        Map<String ,Integer > tags2 = myTag.getTags();
+        for (Map<String ,String > tag : tags1){
+            updateRemoveMap(tags2,tag.get("tag"));
+        }
+        myTag.setTags(tags2);
+
+        // 移除分类
+        Map<String ,Integer> categorys = myTag.getCategorys();
+        updateRemoveMap(categorys,category);
+        myTag.setCategorys(categorys);
+
+        // 移除归档
+        Map<String ,Integer> archives = myTag.getArchives();
+        updateRemoveMap(archives,archive);
+        myTag.setArchives(archives);
+        tagService.update(myTag);
+    }
+
+    /**
+     * 更新map集合,删去值
+     * @param maps Map<String ,Integer>
+     * @param key 键
+     */
+    private void updateRemoveMap(Map<String ,Integer> maps,String key){
+        if (maps.containsKey(key)){
+            // 如果值大于1就减1
+            if (maps.get(key) > 1){
+                maps.put(key, maps.get(key) - 1);
+            }else { // 否则移除这个键
+                maps.remove(key);
+            }
+        }
+    }
+
+    /**
+     * 更新map集合,增加值
+     * @param maps Map<String ,Integer>
+     * @param key 键
+     */
+    private void updateAddMap(Map<String ,Integer> maps,String key){
+        // 如果键存在则+1
+        if (maps.containsKey(key)){
+            maps.put(key, maps.get(key) + 1);
+        }else { // 如果不存在就put进去
+            maps.put(key,1);
         }
     }
 }

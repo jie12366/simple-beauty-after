@@ -1,6 +1,5 @@
 package ncu.soft.blog.service;
 
-import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
 
 /**
@@ -15,6 +14,13 @@ public interface DetailService {
      * @param articleDetail 文章内容
      */
     ArticleDetail save(ArticleDetail articleDetail);
+
+    /**
+     * 更新文章详情
+     * @param articleDetail 文章详情
+     * @return ArticleDetail
+     */
+    ArticleDetail update(ArticleDetail articleDetail);
 
     /**
      * 根据文章id获取文章内容

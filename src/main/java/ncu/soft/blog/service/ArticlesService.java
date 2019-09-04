@@ -13,9 +13,12 @@ public interface ArticlesService {
     /**
      * 保存文章信息
      * @param article Article
+     * @param aid Int
      * @return 返回存入的对象
      */
-    Article save(Article article,String contentHtml);
+    Article save(Article article,String contentHtml,int aid);
+
+    void delete(int aid);
 
     /**
      * 分页查询所有数据

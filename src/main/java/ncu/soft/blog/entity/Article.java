@@ -38,11 +38,6 @@ public class Article implements Serializable {
     private int uid;
 
     /**
-     * 用户昵称
-     */
-    private String uNickname;
-
-    /**
      * 文章个人分类
      */
     private String category;
@@ -93,22 +88,6 @@ public class Article implements Serializable {
      * 文章评论数
      */
     private int comments;
-
-    public Article(int uid, String uNickname, String category, List<Map<String ,String >> tags, String coverPath,
-                   String title, String summary, Date articleTime,String pwd, int reads, int likes, int comments) {
-        this.uid = uid;
-        this.uNickname = uNickname;
-        this.category = category;
-        this.tags = tags;
-        this.coverPath = coverPath;
-        this.title = title;
-        this.summary = summary;
-        this.articleTime = articleTime;
-        this.pwd = pwd;
-        this.reads = reads;
-        this.likes = likes;
-        this.comments = comments;
-    }
 
     public Article(int uid, String category, List<Map<String ,String >> tags, String title, String pwd) {
         this.uid = uid;

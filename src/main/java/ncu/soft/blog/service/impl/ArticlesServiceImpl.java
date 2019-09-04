@@ -52,7 +52,7 @@ public class ArticlesServiceImpl implements ArticlesService {
     TagService tagService;
 
     @Override
-    public Article save(Article article,String contentHtml) {
+    public Article save(Article article,String contentHtml,int aid) {
 
         Date date = new Date();
         MyTag myTag = tagService.findByUid(article.getUid());
@@ -72,16 +72,27 @@ public class ArticlesServiceImpl implements ArticlesService {
             coverPath = elements.get(0).attr("src");
         }
 
-        // 获取用户昵称
-        String nickname = usersInfoService.findByUid(article.getUid()).getNickName();
         article.setSummary(summary);
         article.setCoverPath(coverPath);
-        article.setUNickname(nickname);
         article.setArticleTime(date);
         article.setReads(0);
         article.setLikes(0);
         article.setComments(0);
-        return mongoTemplate.insert(article);
+        if (aid == 0){
+            return mongoTemplate.insert(article);
+        }else if (aid > 0){
+            Update update = Update.update("category",article.getCategory()).set("tags",article.getTags())
+                    .set("cPath",coverPath).set("title",article.getTitle()).set("summary",summary)
+                    .set("aTime",date).set("pwd",article.getPwd());
+            FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+            return mongoTemplate.findAndModify(new Query(Criteria.where("id").is(aid)),update,options,Article.class);
+        }
+        return null;
+    }
+
+    @Override
+    public void delete(int aid) {
+        mongoTemplate.remove(new Query(Criteria.where("id").is(aid)),Article.class);
     }
 
     @Override

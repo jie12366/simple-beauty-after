@@ -57,7 +57,7 @@ public class WriterController {
     @LoginToken
     public JsonResult saveArticles(@Valid @RequestParam("uid") int uid, @RequestParam("title") String title,
                                    @RequestParam("category") String category, @RequestParam("tags") String tags,@RequestParam("pwd")String pwd,
-                                   @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml){
+                                   @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml,@RequestParam("aid") int aid){
         // 解析json字符串为list集合
         List<String> tags1 = JSON.parseArray(tags,String.class);
         List<Map<String ,String >> tagList = new ArrayList<>();
@@ -68,10 +68,12 @@ public class WriterController {
         }
         Article article = new Article(uid,category,tagList,title,pwd);
         // 保存文章信息并返回
-        Article article1 = articlesService.save(article,contentHtml);
+        Article article1 = articlesService.save(article,contentHtml,aid);
 
-        //文章数加1
-        usersInfoService.updateArticles(1,uid);
+        if(aid == 0) {
+            //文章数加1
+            usersInfoService.updateArticles(1,uid);
+        }
 
         if (article1 == null){
             // 保存数据错误
@@ -83,12 +85,27 @@ public class WriterController {
         articleDetail.setContentMd(contentMd);
         articleDetail.setContentHtml(contentHtml);
 
+        ArticleDetail articleDetail1 = null;
+        if (aid > 0){
+            articleDetail1 = detailService.update(articleDetail);
+        }else {
+            articleDetail1 = detailService.save(articleDetail);
+        }
+
         //保存文章详情内容
-        if (detailService.save(articleDetail) != null){
+        if (articleDetail1 != null){
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.SAVE_ERROR);
         }
+    }
+
+    @ApiOperation("删除文章")
+    @DeleteMapping("/articles/{aid}")
+    @LoginToken
+    public JsonResult deleteArticle(@Valid @PathVariable("aid") int aid){
+        articlesService.delete(aid);
+        return JsonResult.success();
     }
 
     @ApiOperation("获取用户所有个人分类")

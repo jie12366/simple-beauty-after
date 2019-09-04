@@ -9,9 +9,11 @@ import org.jsoup.select.Elements;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,8 +37,34 @@ public class DetailServiceImpl implements DetailService {
     @Override
     @CachePut(key = "#articleDetail.aid")
     public ArticleDetail save(ArticleDetail articleDetail) {
+        // 将所有的标签放在一个list集合中
+        List<Map<String ,String >> directory = getDirectory(articleDetail.getContentHtml());
+        articleDetail.setDirectory(directory);
+        return template.insert(articleDetail);
+    }
+
+    @Override
+    public ArticleDetail update(ArticleDetail articleDetail) {
+        Update update = Update.update("cHtml",articleDetail.getContentHtml()).set("cMd",articleDetail.getContentMd())
+                .set("directory",getDirectory(articleDetail.getContentHtml()));
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+        return template.findAndModify(new Query(Criteria.where("aid").is(articleDetail.getAid())),update,options,ArticleDetail.class);
+    }
+
+    @Override
+    @Cacheable(key = "#aid")
+    public ArticleDetail getArticleByAid(int aid) {
+        return template.findOne(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
+    }
+
+    /**
+     * 解析html，返回文章目录
+     * @param html html内容
+     * @return List<Map<String ,String >>
+     */
+    private List<Map<String ,String >> getDirectory(String html){
         //通过jsoup获取h标签
-        Document document = Jsoup.parse(articleDetail.getContentHtml());
+        Document document = Jsoup.parse(html);
         Elements elements = document.select("h2, h3");
         // 将所有的标签放在一个list集合中
         List<Map<String ,String >> directory = new ArrayList<>();
@@ -53,13 +81,6 @@ public class DetailServiceImpl implements DetailService {
                 directory.add(h);
             }
         }
-        articleDetail.setDirectory(directory);
-        return template.insert(articleDetail);
-    }
-
-    @Override
-    @Cacheable(key = "#aid")
-    public ArticleDetail getArticleByAid(int aid) {
-        return template.findOne(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
+        return directory;
     }
 }

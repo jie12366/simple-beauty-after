@@ -1,7 +1,6 @@
 package ncu.soft.blog.controller.article;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -100,14 +100,6 @@ public class WriterController {
         }
     }
 
-    @ApiOperation("删除文章")
-    @DeleteMapping("/articles/{aid}/{uid}")
-    @LoginToken
-    public JsonResult deleteArticle(@Valid @PathVariable("aid") int aid,@PathVariable("uid") int uid){
-        articlesService.delete(aid,uid);
-        return JsonResult.success();
-    }
-
     @ApiOperation("获取用户所有个人分类")
     @GetMapping("/categorys/{uid}")
     public JsonResult getCategorys(@Valid @PathVariable("uid") int uid){

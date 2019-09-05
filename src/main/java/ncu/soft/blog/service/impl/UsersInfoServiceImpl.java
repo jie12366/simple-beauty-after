@@ -1,5 +1,6 @@
 package ncu.soft.blog.service.impl;
 
+import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.UsersInfo;
 import ncu.soft.blog.service.UsersInfoService;
 import org.springframework.cache.annotation.CacheConfig;
@@ -72,10 +73,45 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     }
 
     @Override
-    public void updateArticles(int articles, int uid) {
+    @CachePut(key = "#uid")
+    public UsersInfo updateArticles(int articles, int uid) {
+        return updateNumber(uid,"articles");
+    }
+
+    @Override
+    @CachePut(key = "#uid")
+    public UsersInfo updateReads(int reads, int uid) {
+        return updateNumber(uid,"reads");
+    }
+
+    @Override
+    @CachePut(key = "#uid")
+    public UsersInfo updateFans(int fans, int uid) {
+        return updateNumber(uid,"fans");
+    }
+
+    @Override
+    @CachePut(key = "#uid")
+    public UsersInfo updateLikes(int likes, int uid) {
+        return updateNumber(uid,"likes");
+    }
+
+    @Override
+    @CachePut(key = "#uid")
+    public UsersInfo updateAttentions(int attentions, int uid) {
+        return updateNumber(uid,"attentions");
+    }
+
+    /**
+     * 更新阅读、评论、喜欢数
+     * @param uid 用户id
+     * @param key 阅读/评论/喜欢
+     * @return Article
+     */
+    private UsersInfo updateNumber(int uid, String key){
         Query query = new Query(Criteria.where("uid").is(uid));
-        //按指定的数字增加
-        Update update = new Update().inc("articles",articles);
-        mongoTemplate.updateFirst(query,update,UsersInfo.class);
+        Update update = new Update().inc(key,1);
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+        return mongoTemplate.findAndModify(query,update,options,UsersInfo.class);
     }
 }

@@ -42,7 +42,7 @@ public interface PhotosService {
     /**
      * 删除照片
      * @param uid 用户id
-     * @param photo 照片对象
+     * @param url 照片路径
      */
-    Photos deletePhoto(int uid,Photo photo);
+    Photos deletePhoto(int uid, String url);
 }

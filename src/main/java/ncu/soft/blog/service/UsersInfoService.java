@@ -57,5 +57,33 @@ public interface UsersInfoService {
      * @param articles 文章数(1或-1)
      * @param uid 用户id
      */
-    void updateArticles(int articles,int uid);
+    UsersInfo updateArticles(int articles,int uid);
+
+    /**
+     * 按指定的数字更新文章数
+     * @param reads 阅读数(1或-1)
+     * @param uid 用户id
+     */
+    UsersInfo updateReads(int reads,int uid);
+
+    /**
+     * 按指定的数字更新文章数
+     * @param likes 喜欢数(1或-1)
+     * @param uid 用户id
+     */
+    UsersInfo updateLikes(int likes,int uid);
+
+    /**
+     * 按指定的数字更新文章数
+     * @param fans 粉丝数(1或-1)
+     * @param uid 用户id
+     */
+    UsersInfo updateFans(int fans,int uid);
+
+    /**
+     * 按指定的数字更新文章数
+     * @param attentions 关注数(1或-1)
+     * @param uid 用户id
+     */
+    UsersInfo updateAttentions(int attentions,int uid);
 }

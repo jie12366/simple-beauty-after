@@ -51,9 +51,24 @@ public interface ArticlesService {
 
     /**
      * 阅读量+1
+     * @param aid 文章id
      * @return 更新后的对象
      */
     Article updateReads(int aid);
+
+    /**
+     * 阅读量+1
+     * @param aid 文章id
+     * @return 更新后的对象
+     */
+    Article updateComments(int aid);
+
+    /**
+     * 阅读量+1
+     * @param aid 文章id
+     * @return 更新后的对象
+     */
+    Article updateLikes(int aid);
 
     /**
      * 获取用户指定标签的文章

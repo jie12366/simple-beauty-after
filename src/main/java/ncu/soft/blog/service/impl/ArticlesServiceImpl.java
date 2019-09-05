@@ -24,7 +24,6 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,10 +131,19 @@ public class ArticlesServiceImpl implements ArticlesService {
     @Override
     @CachePut(key = "'article' + #aid")
     public Article updateReads(int aid) {
-        Query query = new Query(Criteria.where("id").is(aid));
-        Update update = new Update().inc("reads",1);
-        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
-        return mongoTemplate.findAndModify(query,update,options,Article.class);
+        return updateNumber(aid,"reads");
+    }
+
+    @Override
+    @CachePut(key = "'article' + #aid")
+    public Article updateComments(int aid) {
+        return updateNumber(aid,"comments");
+    }
+
+    @Override
+    @CachePut(key = "'article' + #aid")
+    public Article updateLikes(int aid) {
+        return updateNumber(aid,"likes");
     }
 
     @Override
@@ -182,6 +190,19 @@ public class ArticlesServiceImpl implements ArticlesService {
         long count = mongoTemplate.count(query,Article.class);
         List<Article> articles = mongoTemplate.find(query,Article.class);
         return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> count);
+    }
+
+    /**
+     * 更新阅读、评论、喜欢数
+     * @param aid 文章id
+     * @param key 阅读/评论/喜欢
+     * @return Article
+     */
+    private Article updateNumber(int aid,String key){
+        Query query = new Query(Criteria.where("id").is(aid));
+        Update update = new Update().inc(key,1);
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+        return mongoTemplate.findAndModify(query,update,options,Article.class);
     }
 
     /**

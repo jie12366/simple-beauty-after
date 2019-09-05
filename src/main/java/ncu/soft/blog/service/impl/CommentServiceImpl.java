@@ -1,6 +1,7 @@
 package ncu.soft.blog.service.impl;
 
 import ncu.soft.blog.entity.Comment;
+import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.CommentService;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,10 +32,14 @@ public class CommentServiceImpl implements CommentService {
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
+    @Resource
+    ArticlesService articlesService;
+
     @Override
     @CacheEvict(allEntries = true)
     public Comment save(Comment comment) {
         comment.setCTime(new Date());
+        articlesService.updateComments(comment.getAid());
         return mongoTemplate.insert(comment);
     }
 
@@ -42,6 +47,7 @@ public class CommentServiceImpl implements CommentService {
     @CacheEvict(allEntries = true)
     public Comment saveReply(Comment comment) {
         comment.setCTime(new Date());
+        articlesService.updateComments(comment.getAid());
         return mongoTemplate.insert(comment);
     }
 

@@ -1,5 +1,7 @@
 package ncu.soft.blog.controller.login;
 
+import com.alibaba.fastjson.JSONObject;
+import com.zhenzi.sms.ZhenziSmsClient;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.entity.UsersInfo;
@@ -47,12 +49,12 @@ public class SignUpController {
         String code = GetString.getCode();
         System.out.println("code = " + code);
         //榛子短信的SDK
-        /*ZhenziSmsClient client = new ZhenziSmsClient("https://sms_developer.zhenzikj.com", "101348", "ZGZmNjM3MWYtZDVjMS00YWUyLWE4NmUtZDI5NjNmOGRjNTA1");
+        ZhenziSmsClient client = new ZhenziSmsClient("https://sms_developer.zhenzikj.com", "101348", "ZGZmNjM3MWYtZDVjMS00YWUyLWE4NmUtZDI5NjNmOGRjNTA1");
         String result = client.send(phone, "您的验证码为" + code + "\n" + "如果不是本人操作，请忽略。");
         JSONObject jsonObject = JSONObject.parseObject(result);
         if ((Integer) jsonObject.get("code") != 0){
-            return JsonResult.errorMsg("验证码发送失败");
-        }*/
+            return JsonResult.failure(ResultCode.INTERFACE_REQUEST_TIMEOUT);
+        }
 
         //设置验证码1分钟后过期
         valueOperations.set(SMS,code,1, TimeUnit.MINUTES);

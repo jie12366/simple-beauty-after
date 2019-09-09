@@ -7,6 +7,7 @@ import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.DetailService;
 import ncu.soft.blog.service.TagService;
+import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +35,9 @@ public class ShowController {
 
     @Resource
     TagService tagService;
+
+    @Resource
+    UsersInfoService usersInfoService;
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -70,6 +74,7 @@ public class ShowController {
         articlesService.updateReads(aid);
         Article article = articlesService.getArticle(aid);
         if (article != null){
+            usersInfoService.updateReads(1,article.getUid());
             return JsonResult.success(article);
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);

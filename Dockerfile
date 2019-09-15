@@ -5,7 +5,6 @@ FROM maven:3.5.4-alpine
 ADD . /blog
 WORKDIR /blog/
 RUN mvn clean package
-RUN cd target
-RUN ls
+ADD target/blog-0.0.1-SNAPSHOT.jar blog.jar
 EXPOSE 81
-ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -jar target/blog-0.0.1-SNAPSHOT.jar
+ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -jar blog.jar

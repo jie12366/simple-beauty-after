@@ -71,7 +71,7 @@ public class ShowController {
     @GetMapping("/article/{aid}")
     public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid){
         // 更新阅读量，+1
-        articlesService.updateReads(aid);
+        articlesService.updateReads(aid,1);
         Article article = articlesService.getArticle(aid);
         if (article != null){
             usersInfoService.updateReads(1,article.getUid());

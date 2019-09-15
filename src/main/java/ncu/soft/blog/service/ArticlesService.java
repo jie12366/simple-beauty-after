@@ -52,23 +52,26 @@ public interface ArticlesService {
     /**
      * 阅读量+1
      * @param aid 文章id
+     * @param num 数量
      * @return 更新后的对象
      */
-    Article updateReads(int aid);
+    Article updateReads(int aid,int num);
 
     /**
-     * 阅读量+1
+     * 评论量+1
      * @param aid 文章id
+     * @param num 数量
      * @return 更新后的对象
      */
-    Article updateComments(int aid);
+    Article updateComments(int aid,int num);
 
     /**
-     * 阅读量+1
+     * 喜欢量+1
      * @param aid 文章id
+     * @param num 数量
      * @return 更新后的对象
      */
-    Article updateLikes(int aid);
+    Article updateLikes(int aid,int num);
 
     /**
      * 获取用户指定标签的文章

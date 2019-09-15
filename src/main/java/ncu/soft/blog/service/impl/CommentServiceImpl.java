@@ -39,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
     @CacheEvict(allEntries = true)
     public Comment save(Comment comment) {
         comment.setCTime(new Date());
-        articlesService.updateComments(comment.getAid());
+        articlesService.updateComments(comment.getAid(),1);
         return mongoTemplate.insert(comment);
     }
 
@@ -47,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
     @CacheEvict(allEntries = true)
     public Comment saveReply(Comment comment) {
         comment.setCTime(new Date());
-        articlesService.updateComments(comment.getAid());
+        articlesService.updateComments(comment.getAid(),1);
         return mongoTemplate.insert(comment);
     }
 

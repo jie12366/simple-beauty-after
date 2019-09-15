@@ -130,20 +130,20 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     @Override
     @CachePut(key = "'article' + #aid")
-    public Article updateReads(int aid) {
-        return updateNumber(aid,"reads");
+    public Article updateReads(int aid,int num) {
+        return updateNumber(aid,"reads",num);
     }
 
     @Override
     @CachePut(key = "'article' + #aid")
-    public Article updateComments(int aid) {
-        return updateNumber(aid,"comments");
+    public Article updateComments(int aid,int num) {
+        return updateNumber(aid,"comments",num);
     }
 
     @Override
     @CachePut(key = "'article' + #aid")
-    public Article updateLikes(int aid) {
-        return updateNumber(aid,"likes");
+    public Article updateLikes(int aid,int num) {
+        return updateNumber(aid,"likes",num);
     }
 
     @Override
@@ -198,9 +198,9 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param key 阅读/评论/喜欢
      * @return Article
      */
-    private Article updateNumber(int aid,String key){
+    private Article updateNumber(int aid,String key,int num){
         Query query = new Query(Criteria.where("id").is(aid));
-        Update update = new Update().inc(key,1);
+        Update update = new Update().inc(key,num);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
         return mongoTemplate.findAndModify(query,update,options,Article.class);
     }

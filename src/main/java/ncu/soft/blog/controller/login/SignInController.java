@@ -1,9 +1,9 @@
 package ncu.soft.blog.controller.login;
 
+import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.service.UserService;
-import ncu.soft.blog.utils.CaptchaService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.JwtUtil;
 import ncu.soft.blog.utils.ResultCode;
@@ -34,12 +34,19 @@ public class SignInController {
     @Resource
     ValueOperations<String ,Object> valueOperations;
 
+    @Resource
+    private Producer captchaProducer;
+
+    private final static String IMAGE = "imageCaptcha";
+
     @ApiOperation("图形验证码")
     @GetMapping(value = "/imageCaptcha",produces = "image/jpeg")
-    public void getCode(HttpServletRequest request,HttpServletResponse response) throws IOException {
+    public void getCode(HttpServletResponse response) throws IOException {
+        // 生成验证码
+        String capText = captchaProducer.createText();
+        valueOperations.set(IMAGE,capText);
         //生成图片验证码
-        BufferedImage bi = CaptchaService.getInstance().getImageChallengeForID(request.getSession(true)
-                .getId());
+        BufferedImage bi = captchaProducer.createImage(capText);
         //将图片验证码以文件流的形式写入到响应中
         ServletOutputStream out = response.getOutputStream();
         ImageIO.write(bi, "JPEG", out);
@@ -48,17 +55,6 @@ public class SignInController {
         } finally {
             out.close();
         }
-    }
-
-    @ApiOperation("检查图形验证码是否正确")
-    @PostMapping("/imageCaptcha")
-    public JsonResult checkVerifyCode(HttpServletRequest request,
-                                      @Valid @RequestParam("code") String code){
-        Boolean isCaptchaCorrect = CaptchaService.getInstance().validateResponseForID(request.getSession().getId(), code);
-        if (isCaptchaCorrect){
-            return JsonResult.success();
-        }
-        return JsonResult.failure(ResultCode.CAPTCHA_IS_ERROR);
     }
 
     @ApiOperation("检查账号是否存在")

@@ -1,6 +1,5 @@
 package ncu.soft.blog.controller.login;
 
-import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.service.UserService;
@@ -11,13 +10,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,22 +26,6 @@ public class SignInController {
 
     @Resource
     ValueOperations<String ,Object> valueOperations;
-
-    @Resource
-    private Producer captchaProducer;
-
-    private final static String IMAGE = "imageCaptcha";
-
-    @ApiOperation("图形验证码")
-    @GetMapping(value = "/imageCaptcha",produces = "image/jpeg")
-    public void getCode(HttpServletResponse response) throws IOException {
-        // 生成验证码
-        String capText = captchaProducer.createText();
-        valueOperations.set(IMAGE,capText);
-
-        //将图片验证码以文件流的形式写入到响应中
-        ImageIO.write(captchaProducer.createImage(capText),"JPEG",response.getOutputStream());
-    }
 
     @ApiOperation("检查账号是否存在")
     @PostMapping("/account")

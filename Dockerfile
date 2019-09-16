@@ -1,5 +1,5 @@
 # 该镜像需要依赖的基础镜像
-FROM frolvlad/alpine-oraclejdk8:slim
+FROM java:8
 FROM maven:3.5.4-alpine
 # 打包
 ADD . /blog

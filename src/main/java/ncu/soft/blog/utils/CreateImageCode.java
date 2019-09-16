@@ -52,8 +52,8 @@ public class CreateImageCode {
         g.setFont(getFont());
         g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
                 .nextInt(121)));
-        String rand = String.valueOf(getRandomString(random.nextInt(randString
-                .length())));
+        String rand = getRandomString(random.nextInt(randString
+                .length()));
         String randomString = "";
         randomString += rand;
         g.translate(random.nextInt(3), random.nextInt(3));
@@ -75,7 +75,7 @@ public class CreateImageCode {
     /**
      * 获取随机的字符
      */
-    public static String getRandomString(int num) {
+    private static String getRandomString(int num) {
         return String.valueOf(randString.charAt(num));
     }
 

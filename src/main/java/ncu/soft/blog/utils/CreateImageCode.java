@@ -48,12 +48,13 @@ public class CreateImageCode {
     /**
      * 绘制字符串
      */
-    private static String drowString(Graphics g, String randomString, int i) {
+    private static String drowString(Graphics g, int i) {
         g.setFont(getFont());
         g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
                 .nextInt(121)));
         String rand = String.valueOf(getRandomString(random.nextInt(randString
                 .length())));
+        String randomString = "";
         randomString += rand;
         g.translate(random.nextInt(3), random.nextInt(3));
         g.drawString(rand, 13 * i, 16);
@@ -94,7 +95,7 @@ public class CreateImageCode {
         // 绘制随机字符
         String randomString = "";
         for (int i = 1; i <= stringNum; i++) {
-            randomString = drowString(g, randomString, i);
+            randomString = drowString(g, i);
         }
         return new ImageCode(image,randomString,300);
     }

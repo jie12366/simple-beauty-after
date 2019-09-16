@@ -1,10 +1,9 @@
 package ncu.soft.blog.controller.login;
 
 import io.swagger.annotations.ApiOperation;
-import ncu.soft.blog.entity.ImageCode;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.service.UserService;
-import ncu.soft.blog.utils.CreateImageCode;
+import ncu.soft.blog.utils.CaptchaService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.JwtUtil;
 import ncu.soft.blog.utils.ResultCode;
@@ -13,8 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -32,19 +34,31 @@ public class SignInController {
     @Resource
     ValueOperations<String ,Object> valueOperations;
 
-    /**图片验证码的key*/
-    private final static String IMAGE = "imageCaptcha";
-
     @ApiOperation("图形验证码")
     @GetMapping(value = "/imageCaptcha",produces = "image/jpeg")
-    public void getCode(HttpServletResponse response) throws IOException {
-
+    public void getCode(HttpServletRequest request,HttpServletResponse response) throws IOException {
         //生成图片验证码
-        ImageCode imageCode = CreateImageCode.createImagecode();
-        //将图片验证码存入redis中，并设置过期时间为5分钟
-        valueOperations.set(IMAGE,imageCode.getCode(),5, TimeUnit.MINUTES);
+        BufferedImage bi = CaptchaService.getInstance().getImageChallengeForID(request.getSession(true)
+                .getId());
         //将图片验证码以文件流的形式写入到响应中
-        ImageIO.write(imageCode.getImage(),"JPEG",response.getOutputStream());
+        ServletOutputStream out = response.getOutputStream();
+        ImageIO.write(bi, "JPEG", out);
+        try {
+            out.flush();
+        } finally {
+            out.close();
+        }
+    }
+
+    @ApiOperation("检查图形验证码是否正确")
+    @PostMapping("/imageCaptcha")
+    public JsonResult checkVerifyCode(HttpServletRequest request,
+                                      @Valid @RequestParam("code") String code){
+        Boolean isCaptchaCorrect = CaptchaService.getInstance().validateResponseForID(request.getSession().getId(), code);
+        if (isCaptchaCorrect){
+            return JsonResult.success();
+        }
+        return JsonResult.failure(ResultCode.CAPTCHA_IS_ERROR);
     }
 
     @ApiOperation("检查账号是否存在")

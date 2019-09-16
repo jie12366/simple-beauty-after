@@ -74,7 +74,7 @@ public class SignUpController {
             return JsonResult.failure(ResultCode.CAPTCHA_IS_ERROR);
         }
         return JsonResult.success();
-}
+    }
 
     @ApiOperation("账号注册")
     @PostMapping("/register")

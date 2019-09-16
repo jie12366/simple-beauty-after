@@ -149,6 +149,13 @@
             <version>1.7.11</version>
         </dependency>
 
+        <!--JCaptcha-->
+        <dependency>
+            <groupId>com.octo.captcha</groupId>
+            <artifactId>jcaptcha</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -45,16 +45,9 @@ public class SignInController {
         // 生成验证码
         String capText = captchaProducer.createText();
         valueOperations.set(IMAGE,capText);
-        //生成图片验证码
-        BufferedImage bi = captchaProducer.createImage(capText);
+
         //将图片验证码以文件流的形式写入到响应中
-        ServletOutputStream out = response.getOutputStream();
-        ImageIO.write(bi, "JPEG", out);
-        try {
-            out.flush();
-        } finally {
-            out.close();
-        }
+        ImageIO.write(captchaProducer.createImage(capText),"JPEG",response.getOutputStream());
     }
 
     @ApiOperation("检查账号是否存在")

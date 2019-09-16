@@ -19,8 +19,10 @@ public class KaptchaConfig {
         DefaultKaptcha captchaProducer = new DefaultKaptcha();
         Properties properties = new Properties();
         properties.setProperty("kaptcha.border", "yes");
-        properties.setProperty("kaptcha.border.color", "105,179,90");
-        properties.setProperty("kaptcha.textproducer.font.color", "blue");
+        properties.setProperty("kaptcha.border.color", "204,204,204");
+        properties.setProperty("kaptcha.textproducer.font.color", "255,102,0");
+        properties.setProperty("kaptcha.noise.color", "153,204,255");
+        properties.setProperty("kaptcha.background.clear.from","102,102,153");
         properties.setProperty("kaptcha.image.width", "110");
         properties.setProperty("kaptcha.image.height", "40");
         properties.setProperty("kaptcha.textproducer.font.size", "30");

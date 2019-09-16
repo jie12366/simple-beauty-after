@@ -52,8 +52,7 @@ public class CreateImageCode {
         g.setFont(getFont());
         g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
                 .nextInt(121)));
-        String rand = getRandomString(random.nextInt(randString
-                .length()));
+        String rand = getRandomString(random.nextInt(36));
         String randomString = "";
         randomString += rand;
         g.translate(random.nextInt(3), random.nextInt(3));

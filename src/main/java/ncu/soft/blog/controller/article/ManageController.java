@@ -1,13 +1,13 @@
 package ncu.soft.blog.controller.article;
 
 import io.swagger.annotations.ApiOperation;
+import ncu.soft.blog.component.WebSocketServer;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.Message;
 import ncu.soft.blog.entity.UsersInfo;
 import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.MessageService;
-import ncu.soft.blog.service.SocketService;
 import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
@@ -36,7 +36,7 @@ public class ManageController {
     MessageService messageService;
 
     @Resource
-    SocketService socketService;
+    WebSocketServer webSocketServer;
 
     private final static String LIKE = "like";
 
@@ -53,8 +53,8 @@ public class ManageController {
     public JsonResult likeArticle(@Valid @PathVariable("aid") int aid,@PathVariable("uid") int uid){
         Article article = articlesService.getArticle(aid);
         UsersInfo usersInfo = usersInfoService.findByUid(uid);
-        socketService.pushMessage(String.valueOf(uid), "like");
         int likes = 0;
+        webSocketServer.sendInfo("like",String.valueOf(uid));
         if (messageService.getMessageByType(aid,uid,LIKE) != null){
             messageService.delete(aid,uid,LIKE);
             likes = articlesService.updateLikes(aid,-1).getLikes();
@@ -94,8 +94,8 @@ public class ManageController {
     public JsonResult changeState(@Valid @PathVariable("aid") int aid, @PathVariable("uid") int uid,
                                   @PathVariable("type") String type){
         Message message = messageService.changeMessageState(uid, aid, type);
+        webSocketServer.sendInfo("hasRead",String.valueOf(uid));
         if (message != null){
-            socketService.pushMessage(String.valueOf(uid), "hasRead");
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.UPDATE_ERROR);

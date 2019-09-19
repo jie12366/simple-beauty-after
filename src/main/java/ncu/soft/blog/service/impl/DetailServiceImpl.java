@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -44,6 +45,7 @@ public class DetailServiceImpl implements DetailService {
     }
 
     @Override
+    @CachePut(key = "#articleDetail.aid")
     public ArticleDetail update(ArticleDetail articleDetail) {
         Update update = Update.update("cHtml",articleDetail.getContentHtml()).set("cMd",articleDetail.getContentMd())
                 .set("directory",getDirectory(articleDetail.getContentHtml()));
@@ -52,6 +54,7 @@ public class DetailServiceImpl implements DetailService {
     }
 
     @Override
+    @CacheEvict(key = "#aid")
     public void delete(int aid) {
         template.remove(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
     }

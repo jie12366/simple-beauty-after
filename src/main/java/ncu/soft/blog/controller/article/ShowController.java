@@ -11,12 +11,14 @@ import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -38,6 +40,9 @@ public class ShowController {
 
     @Resource
     UsersInfoService usersInfoService;
+
+    @Resource
+    SetOperations<String,Integer> setOperations;
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -68,13 +73,31 @@ public class ShowController {
     }
 
     @ApiOperation("获取文章数据")
-    @GetMapping("/article/{aid}")
-    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid){
-        // 更新阅读量，+1
-        articlesService.updateReads(aid,1);
+    @GetMapping("/article/{aid}/{uid}")
+    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid,@PathVariable("uid")int uid){
         Article article = articlesService.getArticle(aid);
         if (article != null){
-            usersInfoService.updateReads(1,article.getUid());
+            // 如果键存在
+            if (setOperations.getOperations().hasKey(String.valueOf(aid))){
+                // 如果该键不存在该元素
+                if (!setOperations.members(String.valueOf(aid)).contains(uid)){
+                    // 将点赞这篇文章的uid放进集合中
+                    setOperations.add(String.valueOf(aid),uid);
+                    // 更新文章阅读量，+1
+                    articlesService.updateReads(aid,1);
+                    // 更新个人访问，+1
+                    usersInfoService.updateReads(1,article.getUid());
+                }
+            }else {
+                // 将点赞这篇文章的uid放进集合中
+                setOperations.add(String.valueOf(aid),uid);
+                // 将key持久化
+                setOperations.getOperations().persist(String.valueOf(aid));
+                // 更新文章阅读量，+1
+                articlesService.updateReads(aid,1);
+                // 更新个人访问，+1
+                usersInfoService.updateReads(1,article.getUid());
+            }
             return JsonResult.success(article);
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);

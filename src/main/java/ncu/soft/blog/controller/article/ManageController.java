@@ -54,21 +54,30 @@ public class ManageController {
         Article article = articlesService.getArticle(aid);
         UsersInfo usersInfo = usersInfoService.findByUid(uid);
         int likes = 0;
-        webSocketServer.sendInfo("like",String.valueOf(uid));
+        // 判断该文章是否已被该用户点赞
         if (messageService.getMessageByType(aid,uid,LIKE) != null){
+            // 向客户端推送消息，有人取消点赞了
+            webSocketServer.sendInfo("unLike",String.valueOf(uid));
             messageService.delete(aid,uid,LIKE);
             likes = articlesService.updateLikes(aid,-1).getLikes();
+            usersInfoService.updateLikes(-1,uid);
         }else {
+            // 向客户端推送消息，有人点赞了
+            webSocketServer.sendInfo("like",String.valueOf(uid));
+            // 将点赞消息存入数据库
             Message message1 = new Message(LIKE,aid,uid,"点赞了你的博文",
                     article.getTitle(),usersInfo.getNickName(),new Date(),false);
             messageService.save(message1);
+            // 更新文章喜欢量
             likes = articlesService.updateLikes(aid,1).getLikes();
+            // 更新个人喜欢量
+            usersInfoService.updateLikes(1,uid);
         }
         return JsonResult.success(likes);
     }
 
     @ApiOperation("获取某用户是否对文章点赞")
-    @GetMapping("/article/{aid}/{uid}")
+    @GetMapping("/article/like/{aid}/{uid}")
     public JsonResult isLike(@Valid @PathVariable("aid") int aid,@PathVariable("uid") int uid){
         Message message = messageService.getMessageByType(aid,uid,LIKE);
         if (message == null){

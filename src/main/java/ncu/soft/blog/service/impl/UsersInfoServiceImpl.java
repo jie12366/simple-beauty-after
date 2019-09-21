@@ -75,42 +75,43 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     @Override
     @CachePut(key = "#uid")
     public UsersInfo updateArticles(int articles, int uid) {
-        return updateNumber(uid,"articles");
+        return updateNumber(uid,"articles",articles);
     }
 
     @Override
     @CachePut(key = "#uid")
     public UsersInfo updateReads(int reads, int uid) {
-        return updateNumber(uid,"reads");
+        return updateNumber(uid,"reads",1);
     }
 
     @Override
     @CachePut(key = "#uid")
     public UsersInfo updateFans(int fans, int uid) {
-        return updateNumber(uid,"fans");
+        return updateNumber(uid,"fans",fans);
     }
 
     @Override
     @CachePut(key = "#uid")
     public UsersInfo updateLikes(int likes, int uid) {
-        return updateNumber(uid,"likes");
+        return updateNumber(uid,"likes",likes);
     }
 
     @Override
     @CachePut(key = "#uid")
     public UsersInfo updateAttentions(int attentions, int uid) {
-        return updateNumber(uid,"attentions");
+        return updateNumber(uid,"attentions",attentions);
     }
 
     /**
      * 更新阅读、评论、喜欢数
      * @param uid 用户id
      * @param key 阅读/评论/喜欢
+     * @param num 更新的数量
      * @return Article
      */
-    private UsersInfo updateNumber(int uid, String key){
+    private UsersInfo updateNumber(int uid, String key,int num){
         Query query = new Query(Criteria.where("uid").is(uid));
-        Update update = new Update().inc(key,1);
+        Update update = new Update().inc(key,num);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
         return mongoTemplate.findAndModify(query,update,options,UsersInfo.class);
     }

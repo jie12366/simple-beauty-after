@@ -39,7 +39,7 @@ public class SignInController {
 
     @ApiOperation("账号登录")
     @PostMapping("/login")
-    public JsonResult login(@Valid @RequestBody Users users){
+    public JsonResult login(@Valid @RequestBody Users users,@RequestParam("remeberMe")boolean remeberMe){
         if (userService.verifyUser(users) == null){
             return JsonResult.failure(ResultCode.USER_LOGIN_ERROR);
         }else {
@@ -48,8 +48,13 @@ public class SignInController {
             String token = JwtUtil.generateToken(users1);
             //将生成的token的签证作为redis的键
             String key = token.split("\\.")[2];
-            //将token存入redis并设置过期时间为5小时
-            valueOperations.set(key,token,5,TimeUnit.HOURS);
+            if (remeberMe){
+                //如果勾选了记住密码，则将过期时间设置为七天
+                valueOperations.set(key,token,7,TimeUnit.DAYS);
+            }else {
+                //将token存入redis并设置过期时间为7小时
+                valueOperations.set(key,token,7,TimeUnit.HOURS);
+            }
             return JsonResult.success(token);
         }
     }

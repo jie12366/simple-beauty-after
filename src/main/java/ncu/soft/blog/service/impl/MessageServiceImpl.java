@@ -40,6 +40,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void delete(int id) {
+        mongoTemplate.remove(new Query(Criteria.where("id").is(id)),Message.class);
+    }
+
+    @Override
     public Message getMessageByType(int aid, int uid, String type) {
         return mongoTemplate.findOne(new Query(Criteria.where("type").is(type).
                 and("aid").is(aid).and("uid").is(uid)),Message.class);
@@ -51,17 +56,23 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Message changeMessageState(int uid, int aid, String type) {
-        Query query = new Query(Criteria.where("uid").is(uid).and("aid").is(aid).and("type").is(type));
+    public long getMessageWithoutReadByType(String type, int uid) {
+        return mongoTemplate.count(new Query(Criteria.where("uid").is(uid)
+                .and("type").is(type).and("hasRead").is(false)),Message.class);
+    }
+
+    @Override
+    public Message changeMessageState(int id) {
+        Query query = new Query(Criteria.where("id").is(id));
         Update update = Update.update("hasRead",true);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
         return mongoTemplate.findAndModify(query,update,options,Message.class);
     }
 
     @Override
-    public PageImpl<Message> getMessageByUidByPage(int uid,int index,int size) {
+    public PageImpl<Message> getMessageByUidByPage(int uid,String type,int index,int size) {
         Pageable pageable = PageRequest.of(index,size);
-        Query query = new Query(Criteria.where("uid").is(uid));
+        Query query = new Query(Criteria.where("uid").is(uid).and("type").is(type));
         query.with(new Sort(Sort.Direction.DESC,"mTime"));
         query.with(pageable);
         List<Message> messages = mongoTemplate.find(query,Message.class);

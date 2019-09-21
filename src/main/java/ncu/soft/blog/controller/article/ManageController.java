@@ -49,7 +49,8 @@ public class ManageController {
     }
 
     @ApiOperation("文章点赞并推送消息")
-    @PostMapping("/article/{aid}/{uid}")
+    @PostMapping("/article/like/{aid}/{uid}")
+    @LoginToken
     public JsonResult likeArticle(@Valid @PathVariable("aid") int aid,@PathVariable("uid") int uid){
         Article article = articlesService.getArticle(aid);
         UsersInfo usersInfo = usersInfoService.findByUid(uid);
@@ -98,11 +99,21 @@ public class ManageController {
         }
     }
 
+    @ApiOperation("获取某类型的用户未读消息数")
+    @GetMapping("/message/{type}/{uid}")
+    public JsonResult getNoReadMessage(@Valid @PathVariable("type") String type,@PathVariable("uid") int uid){
+        long num = messageService.getMessageWithoutReadByType(type,uid);
+        if (num >= 0) {
+            return JsonResult.success(num);
+        }else {
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }
+    }
+
     @ApiOperation("改变消息未读为已读")
-    @PutMapping("/message/{aid}/{uid}/{type}")
-    public JsonResult changeState(@Valid @PathVariable("aid") int aid, @PathVariable("uid") int uid,
-                                  @PathVariable("type") String type){
-        Message message = messageService.changeMessageState(uid, aid, type);
+    @PutMapping("/message/{id}/{uid}")
+    public JsonResult changeState(@Valid @PathVariable("id") int id,@PathVariable("uid") int uid){
+        Message message = messageService.changeMessageState(id);
         webSocketServer.sendInfo("hasRead",String.valueOf(uid));
         if (message != null){
             return JsonResult.success();
@@ -111,15 +122,22 @@ public class ManageController {
         }
     }
 
-    @ApiOperation("分页获取点赞列表")
-    @GetMapping("/message/{uid}/{index}/{size}")
-    public JsonResult getMessageByPage(@Valid @PathVariable("uid") int uid,
+    @ApiOperation("分页分类获取消息列表")
+    @GetMapping("/message/{uid}/{type}/{index}/{size}")
+    public JsonResult getMessageByPage(@Valid @PathVariable("uid") int uid,@PathVariable("type") String type,
                                        @PathVariable("index") int index,@PathVariable("size") int size){
-        PageImpl<Message> messages = messageService.getMessageByUidByPage(uid, index, size);
+        PageImpl<Message> messages = messageService.getMessageByUidByPage(uid, type, index, size);
         if (messages.isEmpty()) {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
         }else {
             return JsonResult.success(messages);
         }
+    }
+
+    @ApiOperation("删除消息")
+    @DeleteMapping("/message/{id}")
+    public JsonResult deleteMessageById(@Valid @PathVariable("id")int id){
+        messageService.delete(id);
+        return JsonResult.success();
     }
 }

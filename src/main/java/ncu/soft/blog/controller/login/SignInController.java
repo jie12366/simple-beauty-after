@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
@@ -60,13 +61,17 @@ public class SignInController {
     }
 
     @ApiOperation("账号注销")
-    @DeleteMapping("/logout")
-    public JsonResult logout(@Valid @RequestParam("account")String account){
+    @DeleteMapping("/logout/{account}")
+    public JsonResult logout(@Valid @PathVariable("account")String account, HttpServletRequest request){
+        //从http请求头中取出token
+        String token = request.getHeader("Authorization");
         if (userService.findByAccount(account) == null){
             return JsonResult.failure(ResultCode.USER_NOT_EXIST);
         }else {
+            //将生成的token的签证作为redis的键
+            String key = token.split("\\.")[2];
             //删除token
-            valueOperations.getOperations().delete("token");
+            valueOperations.getOperations().delete(key);
             return JsonResult.success();
         }
     }

@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.mail.internet.InternetAddress;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 /**
@@ -42,7 +44,7 @@ public class ShowController {
     UsersInfoService usersInfoService;
 
     @Resource
-    SetOperations<String,Integer> setOperations;
+    SetOperations<String,String> setOperations;
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -73,16 +75,20 @@ public class ShowController {
     }
 
     @ApiOperation("获取文章数据")
-    @GetMapping("/article/{aid}/{uid}")
-    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid,@PathVariable("uid")int uid){
+    @GetMapping("/article/{aid}")
+    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid) throws UnknownHostException {
+        // 获取本机ip
+        InetAddress address = InetAddress.getLocalHost();
+        String ip = address.getHostAddress();
+
         Article article = articlesService.getArticle(aid);
         if (article != null){
             // 如果键存在
             if (setOperations.getOperations().hasKey(String.valueOf(aid))){
                 // 如果该键不存在该元素
-                if (!setOperations.members(String.valueOf(aid)).contains(uid)){
+                if (!setOperations.isMember(String.valueOf(aid),ip)){
                     // 将点赞这篇文章的uid放进集合中
-                    setOperations.add(String.valueOf(aid),uid);
+                    setOperations.add(String.valueOf(aid),ip);
                     // 更新文章阅读量，+1
                     articlesService.updateReads(aid,1);
                     // 更新个人访问，+1
@@ -90,7 +96,7 @@ public class ShowController {
                 }
             }else {
                 // 将点赞这篇文章的uid放进集合中
-                setOperations.add(String.valueOf(aid),uid);
+                setOperations.add(String.valueOf(aid),ip);
                 // 将key持久化
                 setOperations.getOperations().persist(String.valueOf(aid));
                 // 更新文章阅读量，+1

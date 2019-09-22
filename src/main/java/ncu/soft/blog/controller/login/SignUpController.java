@@ -12,10 +12,7 @@ import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -84,5 +81,16 @@ public class SignUpController {
                 "http://cdn.jie12366.xyz/head_boy.png",0,0,0,0,0);
         usersInfoService.save(usersInfo);
         return JsonResult.success();
+    }
+
+    @ApiOperation("重置密码")
+    @PutMapping("/password")
+    public JsonResult resetPwd(@Valid @RequestParam("email") String email,@RequestParam("pwd") String pwd){
+        Users users = userService.updatePwd(email,pwd);
+        if (users != null){
+            return JsonResult.success();
+        }else {
+            return JsonResult.failure(ResultCode.UPDATE_ERROR);
+        }
     }
 }

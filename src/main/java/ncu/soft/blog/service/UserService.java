@@ -36,4 +36,12 @@ public interface UserService {
      * @return 是否匹配
      */
     Users verifyUser(Users users);
+
+    /**
+     * 重置密码
+     * @param email 绑定的邮箱
+     * @param pwd 新密码
+     * @return Users
+     */
+    Users updatePwd(String email,String pwd);
 }

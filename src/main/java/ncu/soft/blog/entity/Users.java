@@ -37,9 +37,4 @@ public class Users implements Serializable {
      * 用户密码
      */
     private String uPwd;
-
-    public Users(String uAccount,String uPwd){
-        this.uAccount = uAccount;
-        this.uPwd = uPwd;
-    }
 }

@@ -52,7 +52,7 @@ public class UsersInfo implements Serializable {
     private String email;
 
     /**
-     * 我的个人介绍
+     * 我的博客介绍
      */
     private String introduction;
 

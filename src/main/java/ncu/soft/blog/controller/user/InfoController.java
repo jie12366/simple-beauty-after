@@ -66,11 +66,10 @@ public class InfoController {
 
     @ApiOperation("发送邮箱验证码")
     @PostMapping("/emailCaptcha")
-    @LoginToken
     public JsonResult sendEmailCaptcha(@Valid @RequestParam("email") String email){
         String code = GetString.getCode();
         StringBuilder html = new StringBuilder();
-        String html1 = "<div style=\"background-color:#eeeeee;height: 100%;\"><h1 style=\"padding:50px;color: #ea705b\">simple-blog</h1>\n" +
+        String html1 = "<div style=\"background-color:#eeeeee;height: 100%;\"><h1 style=\"padding:50px;color: #ea705b\">Canary</h1>\n" +
                 "    <section style=\"background-color: #ffffff;width: 30vw;height: 30%;margin: auto\"><section style=\"margin-left:20%;\"><h1>您好</h1><br/>\n" +
                 "        <p>请使用下面的验证码验证您的操作，验证码五分钟有效。</p><p style=\"width: 120px;height:45px;background-color: #ea705b;color: #ffffff;font-size: 30px;text-align: center\">";
         String html2 = "</p></section></div></div>";

@@ -148,10 +148,18 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!--Google的集合框架-->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>28.1-jre</version>
+        </dependency>
+
+        <!--justAuth,第三方授权登录的工具类库-->
+        <dependency>
+            <groupId>com.xkcoding</groupId>
+            <artifactId>justauth-spring-boot-starter</artifactId>
+            <version>1.1.0</version>
         </dependency>
 
     </dependencies>

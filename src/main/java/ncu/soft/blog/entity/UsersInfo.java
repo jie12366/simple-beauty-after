@@ -98,4 +98,15 @@ public class UsersInfo implements Serializable {
         this.reads = reads;
         this.articles = articles;
     }
+
+    public UsersInfo(int uid, String nickName, String headPath, int attentions, int fans, int likes, int reads, int articles) {
+        this.uid = uid;
+        this.nickName = nickName;
+        this.headPath = headPath;
+        this.attentions = attentions;
+        this.fans = fans;
+        this.likes = likes;
+        this.reads = reads;
+        this.articles = articles;
+    }
 }

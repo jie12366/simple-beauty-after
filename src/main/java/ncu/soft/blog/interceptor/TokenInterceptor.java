@@ -61,25 +61,32 @@ public class TokenInterceptor implements HandlerInterceptor {
                     response.setStatus(401);
                     return false;
                 }
-                String uid = "";
-                try {
-                    uid = JWT.decode(token).getAudience().get(0);
-                }catch (JWTDecodeException jd){
-                    //token取数据出问题
-                    response.setStatus(401);
-                    return false;
+
+                String token1 = "";
+                // 账号密码登录的token
+                if (token.split("\\.").length == 3){
+                    String uid = "";
+                    try {
+                        uid = JWT.decode(token).getAudience().get(0);
+                    }catch (JWTDecodeException jd){
+                        //token取数据出问题
+                        response.setStatus(401);
+                        return false;
+                    }
+
+                    //获取用户信息
+                    Users users = userService.findById(Integer.parseInt(uid));
+
+                    if (users == null){
+                        //用户不存在
+                        response.setStatus(401);
+                        return false;
+                    }
+                    token1 = (String)valueOperations.get(token.split("\\.")[2]);
+                }else {
+                    // 第三方登录的token
+                    token1 = (String)valueOperations.get(token);
                 }
-
-                //获取用户信息
-                Users users = userService.findById(Integer.parseInt(uid));
-
-                if (users == null){
-                    //用户不存在
-                    response.setStatus(401);
-                    return false;
-                }
-
-                String token1 = (String)valueOperations.get(token.split("\\.")[2]);
                 //token过期(登录过期)
                 if (token1 == null){
                     response.setStatus(403);

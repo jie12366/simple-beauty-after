@@ -3,6 +3,7 @@ package ncu.soft.blog.controller.login;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.service.UserService;
+import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.JwtUtil;
 import ncu.soft.blog.utils.ResultCode;
@@ -24,6 +25,9 @@ public class SignInController {
 
     @Resource
     UserService userService;
+
+    @Resource
+    UsersInfoService usersInfoService;
 
     @Resource
     ValueOperations<String ,Object> valueOperations;
@@ -61,12 +65,18 @@ public class SignInController {
     }
 
     @ApiOperation("账号注销")
-    @DeleteMapping("/logout/{account}")
-    public JsonResult logout(@Valid @PathVariable("account")String account, HttpServletRequest request){
+    @DeleteMapping("/logout/{uid}")
+    public JsonResult logout(@Valid @PathVariable("uid")int uid, HttpServletRequest request){
         //从http请求头中取出token
         String token = request.getHeader("Authorization");
-        if (userService.findByAccount(account) == null){
-            return JsonResult.failure(ResultCode.USER_NOT_EXIST);
+        if (userService.findById(uid) == null){
+            if (usersInfoService.findByUid(uid) == null){
+                return JsonResult.failure(ResultCode.USER_NOT_EXIST);
+            }else {
+                //删除token
+                valueOperations.getOperations().delete(token);
+                return JsonResult.success();
+            }
         }else {
             //将生成的token的签证作为redis的键
             String key = token.split("\\.")[2];

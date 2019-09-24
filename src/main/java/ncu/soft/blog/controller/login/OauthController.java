@@ -88,7 +88,7 @@ public class OauthController {
         // 设置token的过期时间
         valueOperations.set(token,token,7, TimeUnit.HOURS);
         // 重定向到前端的第三方登录中转页面
-        response1.sendRedirect("http://127.0.0.1:8081/#/oauth?result=" + res);
+        response1.sendRedirect("http://jie12366.xyz:8081/#/oauth?result=" + res);
     }
 
     private AuthSource getAuthSource(String type) {

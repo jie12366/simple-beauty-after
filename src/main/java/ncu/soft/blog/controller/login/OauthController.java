@@ -13,7 +13,6 @@ import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import ncu.soft.blog.entity.UsersInfo;
 import ncu.soft.blog.service.UsersInfoService;
-import ncu.soft.blog.utils.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.GetMapping;

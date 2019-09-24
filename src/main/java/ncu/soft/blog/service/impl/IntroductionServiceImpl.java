@@ -37,7 +37,7 @@ public class IntroductionServiceImpl implements IntroductionService {
     }
 
     @Override
-    public Introduction findByUid(int uid) {
+    public Introduction findByUid(String uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),Introduction.class);
     }
 }

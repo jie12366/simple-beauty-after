@@ -29,14 +29,12 @@ import java.util.Map;
  * @date 2019/8/26 8:10
  */
 @Service
-@CacheConfig(cacheNames = "detailService")
 public class DetailServiceImpl implements DetailService {
 
     @Resource(name = "mongoTemplate")
     MongoTemplate template;
 
     @Override
-    @CachePut(key = "#articleDetail.aid")
     public ArticleDetail save(ArticleDetail articleDetail) {
         // 将所有的标签放在一个list集合中
         List<Map<String ,String >> directory = getDirectory(articleDetail.getContentHtml());
@@ -45,7 +43,6 @@ public class DetailServiceImpl implements DetailService {
     }
 
     @Override
-    @CachePut(key = "#articleDetail.aid")
     public ArticleDetail update(ArticleDetail articleDetail) {
         Update update = Update.update("cHtml",articleDetail.getContentHtml()).set("cMd",articleDetail.getContentMd())
                 .set("directory",getDirectory(articleDetail.getContentHtml()));
@@ -54,13 +51,11 @@ public class DetailServiceImpl implements DetailService {
     }
 
     @Override
-    @CacheEvict(key = "#aid")
     public void delete(int aid) {
         template.remove(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
     }
 
     @Override
-    @Cacheable(key = "#aid")
     public ArticleDetail getArticleByAid(int aid) {
         return template.findOne(new Query(Criteria.where("aid").is(aid)),ArticleDetail.class);
     }

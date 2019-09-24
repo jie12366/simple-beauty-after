@@ -44,7 +44,7 @@ public class InfoController {
     @ApiOperation("根据uid获取用户信息")
     @GetMapping("/users/{uid}")
     public JsonResult getUsersById(@Valid @PathVariable String uid){
-        UsersInfo usersInfo = usersInfoService.findByUid(Integer.parseInt(uid));
+        UsersInfo usersInfo = usersInfoService.findByUid(uid);
         if (usersInfo != null){
             return JsonResult.success(usersInfo);
         }else {
@@ -57,7 +57,7 @@ public class InfoController {
     @LoginToken
     public JsonResult uploadImage(HttpServletRequest request, @RequestParam("image") MultipartFile image,@RequestParam("uid") int uid) throws IOException {
         String path = uploadService.getPath(request,image);
-        if(usersInfoService.updateHeadPath(path,uid) != null){
+        if(usersInfoService.updateHeadPath(path,String.valueOf(uid)) != null){
             return JsonResult.success(path);
         }else {
             return JsonResult.failure(ResultCode.UPDATE_ERROR);
@@ -84,7 +84,7 @@ public class InfoController {
     @ApiOperation("绑定邮箱")
     @PutMapping("/email")
     @LoginToken
-    public JsonResult bindEmail(@Valid @RequestParam("email") String email, @RequestParam("uid") int uid){
+    public JsonResult bindEmail(@Valid @RequestParam("email") String email, @RequestParam("uid") String uid){
         if (usersInfoService.bindEmail(email,uid) != null){
             return JsonResult.success(email);
         }else {
@@ -106,7 +106,7 @@ public class InfoController {
     @PutMapping("/usersInfo")
     @LoginToken
     public JsonResult updateInfo(@Valid @RequestParam("nickname") String nickname,
-                                 @RequestParam("introduction") String introduction, @RequestParam("uid") int uid){
+                                 @RequestParam("introduction") String introduction, @RequestParam("uid") String uid){
         if (usersInfoService.updateInfo(nickname,introduction,uid) != null){
             return JsonResult.success();
         }else {

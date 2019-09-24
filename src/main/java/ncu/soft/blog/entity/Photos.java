@@ -32,14 +32,14 @@ public class Photos implements Serializable {
      * 用户id
      */
     @Indexed
-    private int uid;
+    private String uid;
 
     /**
      * 用户照片集
      */
     private List<Photo> photos;
 
-    public Photos(int uid, List<Photo> photos) {
+    public Photos(String uid, List<Photo> photos) {
         this.uid = uid;
         this.photos = photos;
     }

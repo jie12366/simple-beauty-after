@@ -25,7 +25,7 @@ public interface MessageService {
      * @param uid 用户id
      * @param type 信息类型
      */
-    void delete(int aid,int uid,String type);
+    void delete(int aid,String uid,String type);
 
     /**
      * 根据id删除消息
@@ -40,14 +40,14 @@ public interface MessageService {
      * @param type 信息类型
      * @return Message
      */
-    Message getMessageByType(int aid,int uid,String type);
+    Message getMessageByType(int aid,String uid,String type);
 
     /**
      * 判断用户是否有未读的消息
      * @param uid 用户id
      * @return 未读数
      */
-    long getMessageWithoutRead(int uid);
+    long getMessageWithoutRead(String uid);
 
     /**
      * 判断用户是否有未读的消息
@@ -55,7 +55,7 @@ public interface MessageService {
      * @param uid 用户id
      * @return 未读数
      */
-    long getMessageWithoutReadByType(String type,int uid);
+    long getMessageWithoutReadByType(String type,String uid);
 
     /**
      * 改变消息未读状态
@@ -72,5 +72,5 @@ public interface MessageService {
      * @param size 每页大小
      * @return PageImpl<Message>
      */
-    PageImpl<Message> getMessageByUidByPage(int uid,String type,int index,int size);
+    PageImpl<Message> getMessageByUidByPage(String uid,String type,int index,int size);
 }

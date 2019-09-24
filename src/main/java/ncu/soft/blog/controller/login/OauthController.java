@@ -71,7 +71,7 @@ public class OauthController {
         JSONObject jsonObject = JSONObject.parseObject(result);
         // 获取json对象中的data对象
         JSONObject data = jsonObject.getJSONObject("data");
-        int uid = Integer.parseInt(data.getString("uuid"));
+        String uid = data.getString("uuid");
         UsersInfo usersInfo1 = usersInfoService.findByUid(uid);
         // 如果用户不存在，则将获取的第三方应用的信息存入(唯一标识uid,昵称,头像)
         if (usersInfo1 == null){
@@ -81,8 +81,6 @@ public class OauthController {
         }
         // 传给前端的数据
         JSONObject res = new JSONObject();
-        res.put("username",data.getString("username"));
-        res.put("avatar",data.getString("avatar"));
         res.put("uid",uid);
         // 取出token
         String token = data.getJSONObject("token").getString("accessToken");
@@ -90,7 +88,7 @@ public class OauthController {
         // 设置token的过期时间
         valueOperations.set(token,token,7, TimeUnit.HOURS);
         // 重定向到前端的第三方登录中转页面
-        response1.sendRedirect("http://jie12366.xyz:8081/#/oauth?result=" + res);
+        response1.sendRedirect("http://127.0.0.1:8081/#/oauth?result=" + res);
     }
 
     private AuthSource getAuthSource(String type) {

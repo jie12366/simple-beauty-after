@@ -35,7 +35,7 @@ public class Article implements Serializable {
     /**
      * 用户uid
      */
-    private int uid;
+    private String uid;
 
     /**
      * 文章个人分类
@@ -89,7 +89,7 @@ public class Article implements Serializable {
      */
     private int comments;
 
-    public Article(int uid, String category, List<Map<String ,String >> tags, String title, String pwd) {
+    public Article(String uid, String category, List<Map<String ,String >> tags, String title, String pwd) {
         this.uid = uid;
         this.category = category;
         this.tags = tags;

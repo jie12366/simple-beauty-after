@@ -14,7 +14,7 @@ public interface UsersInfoService {
      * @param uid 用户id
      * @return UsersInfo
      */
-    UsersInfo findByUid(int uid);
+    UsersInfo findByUid(String uid);
 
     /**
      * 将用户信息插入数据库
@@ -28,14 +28,14 @@ public interface UsersInfoService {
      * @param uid 用户id
      * @return 更新后的用户数据
      */
-    UsersInfo updateHeadPath(String headPath,int uid);
+    UsersInfo updateHeadPath(String headPath,String uid);
 
     /**
      * 给指定的用户绑定邮箱
      * @param email 要绑定的邮箱
      * @param uid 用户id
      */
-    UsersInfo bindEmail(String email,int uid);
+    UsersInfo bindEmail(String email,String uid);
 
     /**
      * 检查昵称是否被用过
@@ -50,40 +50,40 @@ public interface UsersInfoService {
      * @param introduction  个人简介
      * @param uid 用户id
      */
-    UsersInfo updateInfo(String nickname,String introduction,int uid);
+    UsersInfo updateInfo(String nickname,String introduction,String uid);
 
     /**
      * 按指定的数字更新文章数
      * @param articles 文章数(1或-1)
      * @param uid 用户id
      */
-    UsersInfo updateArticles(int articles,int uid);
+    UsersInfo updateArticles(int articles,String uid);
 
     /**
      * 按指定的数字更新文章数
      * @param reads 阅读数(1或-1)
      * @param uid 用户id
      */
-    UsersInfo updateReads(int reads,int uid);
+    UsersInfo updateReads(int reads,String uid);
 
     /**
      * 按指定的数字更新文章数
      * @param likes 喜欢数(1或-1)
      * @param uid 用户id
      */
-    UsersInfo updateLikes(int likes,int uid);
+    UsersInfo updateLikes(int likes,String uid);
 
     /**
      * 按指定的数字更新文章数
      * @param fans 粉丝数(1或-1)
      * @param uid 用户id
      */
-    UsersInfo updateFans(int fans,int uid);
+    UsersInfo updateFans(int fans,String uid);
 
     /**
      * 按指定的数字更新文章数
      * @param attentions 关注数(1或-1)
      * @param uid 用户id
      */
-    UsersInfo updateAttentions(int attentions,int uid);
+    UsersInfo updateAttentions(int attentions,String uid);
 }

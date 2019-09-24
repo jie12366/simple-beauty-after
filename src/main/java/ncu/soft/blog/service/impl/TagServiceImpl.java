@@ -19,14 +19,13 @@ import java.util.Map;
  * @date 2019/8/26 20:17
  */
 @Service
-@CacheConfig(cacheNames = "tagService")
 public class TagServiceImpl implements TagService {
 
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
     @Override
-    public MyTag findByUid(int uid) {
+    public MyTag findByUid(String uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
     }
 
@@ -43,12 +42,17 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public MyTag getAllTags(int uid) {
+    public MyTag getAllTags(String uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
     }
 
     @Override
-    public Map<String, Integer> getAllArchives(int uid) {
-        return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class).getArchives();
+    public Map<String, Integer> getAllArchives(String uid) {
+        MyTag myTag =  mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),MyTag.class);
+        if (myTag != null){
+            return myTag.getArchives();
+        }else {
+            return null;
+        }
     }
 }

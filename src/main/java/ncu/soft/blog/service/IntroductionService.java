@@ -28,5 +28,5 @@ public interface IntroductionService {
      * @param uid 用户id
      * @return Introduction
      */
-    Introduction findByUid(int uid);
+    Introduction findByUid(String uid);
 }

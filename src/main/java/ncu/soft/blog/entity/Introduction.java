@@ -25,7 +25,7 @@ public class Introduction {
      * 用户id
      */
     @Indexed
-    private int uid;
+    private String uid;
 
     /**
      * 姓名

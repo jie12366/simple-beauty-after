@@ -36,7 +36,6 @@ import java.util.Map;
  * @date 2019/8/25 19:47
  */
 @Service
-@CacheConfig(cacheNames = "articlesService")
 public class ArticlesServiceImpl implements ArticlesService {
 
     @Resource(name = "mongoTemplate")
@@ -94,9 +93,9 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public void delete(int aid,int uid) {
+    public void delete(int aid,String uid) {
         // 更新文章数
-        usersInfoService.updateArticles(-1,uid);
+        usersInfoService.updateArticles(-1,String.valueOf(uid));
         // 更新标签、分类、归档
         Article article = getArticle(aid);
         MyTag myTag = tagService.findByUid(article.getUid());
@@ -117,37 +116,33 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public PageImpl<Article> getArticlesByUidByPage(int pageIndex, int pageSize, int uid) {
+    public PageImpl<Article> getArticlesByUidByPage(int pageIndex, int pageSize, String uid) {
         Query query = new Query(Criteria.where("uid").is(uid)).with(new Sort(Sort.Direction.DESC,"aTime"));
         return getArticles(pageIndex,pageSize,query);
     }
 
     @Override
-    @Cacheable(key = "'article' + #aid")
     public Article getArticle(int aid) {
         return mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
     }
 
     @Override
-    @CachePut(key = "'article' + #aid")
     public Article updateReads(int aid,int num) {
         return updateNumber(aid,"reads",num);
     }
 
     @Override
-    @CachePut(key = "'article' + #aid")
     public Article updateComments(int aid,int num) {
         return updateNumber(aid,"comments",num);
     }
 
     @Override
-    @CachePut(key = "'article' + #aid")
     public Article updateLikes(int aid,int num) {
         return updateNumber(aid,"likes",num);
     }
 
     @Override
-    public PageImpl<Article> getArticleByTag(int index, int size, int uid, String tag) {
+    public PageImpl<Article> getArticleByTag(int index, int size, String uid, String tag) {
         // 通过elemMatch查询子文档
         Query query = new Query(Criteria.where("uid").is(uid).and("tags").elemMatch(Criteria.where("tag").is(tag)));
         query.with(new Sort(Sort.Direction.DESC,"aTime"));
@@ -155,13 +150,13 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public PageImpl<Article> getArticleByCategory(int index, int size, int uid, String category) {
+    public PageImpl<Article> getArticleByCategory(int index, int size, String uid, String category) {
         Query query = new Query(Criteria.where("uid").is(uid).and("category").is(category)).with(new Sort(Sort.Direction.DESC,"aTime"));
         return getArticles(index,size,query);
     }
 
     @Override
-    public PageImpl<Article> getArticleByArchive(int index, int size, int uid, String archive) {
+    public PageImpl<Article> getArticleByArchive(int index, int size, String uid, String archive) {
         // 解析归档，获取年月
         String[] date = archive.split("-");
         String year = date[0];
@@ -212,7 +207,7 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param category 分类
      * @param uid 用户id
      */
-    private void addTag(MyTag myTag,List<Map<String ,String > > tags1,String category,int uid, Date date){
+    private void addTag(MyTag myTag,List<Map<String ,String > > tags1,String category,String uid, Date date){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         String archive = sdf.format(date);
         //如果数据为空，则存入数据

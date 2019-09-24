@@ -16,7 +16,7 @@ public interface TagService {
      * @param uid 用户id
      * @return MyTag
      */
-    MyTag findByUid(int uid);
+    MyTag findByUid(String uid);
 
     /**
      * 保存数据
@@ -36,12 +36,12 @@ public interface TagService {
      * @param  uid 用户id
      * @return List<Map<String,Integer>>
      */
-    MyTag getAllTags(int uid);
+    MyTag getAllTags(String uid);
 
     /**
      * 根据uid获取所有归档信息
      * @param uid 用户id
      * @return Map<String ,Integer>
      */
-    Map<String ,Integer> getAllArchives(int uid);
+    Map<String ,Integer> getAllArchives(String uid);
 }

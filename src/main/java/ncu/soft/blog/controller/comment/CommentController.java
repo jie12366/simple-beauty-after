@@ -46,8 +46,8 @@ public class CommentController {
 
     @ApiOperation("将评论存入")
     @PostMapping("/comments")
-    public JsonResult saveComments(@Valid @RequestParam("aid")int aid,@RequestParam("uid") int uid,
-                                   @RequestParam("toUid") int toUid,@RequestParam("content") String content){
+    public JsonResult saveComments(@Valid @RequestParam("aid")int aid,@RequestParam("uid") String uid,
+                                   @RequestParam("toUid") String toUid,@RequestParam("content") String content){
         Comment comment = new Comment(aid,uid,content);
         if (commentService.save(comment) != null){
             pushCommentMessage(aid,toUid,"comment");
@@ -59,7 +59,7 @@ public class CommentController {
 
     @ApiOperation("将评论回复存入")
     @PostMapping("/replyComments")
-    public JsonResult saveReply(@Valid @RequestParam("aid")int aid,@RequestParam("uid")int uid,@RequestParam("rUid")int rUid,
+    public JsonResult saveReply(@Valid @RequestParam("aid")int aid,@RequestParam("uid")String uid,@RequestParam("rUid")String rUid,
                                 @RequestParam("content")String content,@RequestParam("rContent")String rContent){
         Comment comment = new Comment(aid,uid,rUid,content,rContent);
         if (commentService.saveReply(comment) != null){
@@ -86,9 +86,9 @@ public class CommentController {
      * @param aid 文章id
      * @param uid 用户id
      */
-    private void pushCommentMessage(int aid,int uid,String type){
+    private void pushCommentMessage(int aid,String uid,String type){
         Article article = articlesService.getArticle(aid);
-        UsersInfo usersInfo = usersInfoService.findByUid(uid);
+        UsersInfo usersInfo = usersInfoService.findByUid(String.valueOf(uid));
         // 向客户端推送消息，有人评论了
         webSocketServer.sendInfo("comment",String.valueOf(uid));
         String message = "";

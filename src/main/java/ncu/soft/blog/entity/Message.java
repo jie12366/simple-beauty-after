@@ -37,7 +37,7 @@ public class Message {
     /**
      * 用户id
      */
-    private int uid;
+    private String uid;
 
     /**
      * 消息
@@ -64,7 +64,7 @@ public class Message {
      */
     private boolean hasRead;
 
-    public Message(String type, int aid, int uid, String message, String title, String nickname, Date mTime,boolean hasRead) {
+    public Message(String type, int aid, String uid, String message, String title, String nickname, Date mTime,boolean hasRead) {
         this.type = type;
         this.aid = aid;
         this.uid = uid;

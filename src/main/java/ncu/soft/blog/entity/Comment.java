@@ -39,12 +39,12 @@ public class Comment implements Serializable {
      * 评论者的用户id
      */
     @Indexed
-    private int uid;
+    private String uid;
 
     /**
      * 回复的目标id
      */
-    private int rUid;
+    private String rUid;
 
     /**
      * 回复的目标的内容
@@ -61,13 +61,13 @@ public class Comment implements Serializable {
      */
     private String content;
 
-    public Comment(int aid,int uid, String content) {
+    public Comment(int aid,String uid, String content) {
         this.aid = aid;
         this.uid = uid;
         this.content = content;
     }
 
-    public Comment(int aid,int uid, int rUid, String content,String rContent) {
+    public Comment(int aid,String uid, String rUid, String content,String rContent) {
         this.aid = aid;
         this.uid = uid;
         this.rUid = rUid;

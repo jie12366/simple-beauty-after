@@ -45,7 +45,7 @@ public class IntroductionController {
 
     @ApiOperation("获取个人简介")
     @GetMapping("/introduction/{uid}")
-    public JsonResult get(@Valid @PathVariable("uid") int uid){
+    public JsonResult get(@Valid @PathVariable("uid") String uid){
         Introduction introduction = introductionService.findByUid(uid);
         if (introduction == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);

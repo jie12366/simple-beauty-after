@@ -77,7 +77,7 @@ public class SignUpController {
     @PostMapping("/register")
     public JsonResult addUser(@Valid @RequestBody Users users){
         Users users1 = userService.save(users);
-        UsersInfo usersInfo = new UsersInfo(users1.getId(),users.getUAccount(),users.getUAccount(),
+        UsersInfo usersInfo = new UsersInfo(String.valueOf(users1.getId()),users.getUAccount(),users.getUAccount(),
                 "http://cdn.jie12366.xyz/head_boy.png",0,0,0,0,0);
         usersInfoService.save(usersInfo);
         return JsonResult.success();

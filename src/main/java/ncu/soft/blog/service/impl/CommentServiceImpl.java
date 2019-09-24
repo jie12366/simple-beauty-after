@@ -26,7 +26,6 @@ import java.util.List;
  * @date 2019/8/31 15:20
  */
 @Service
-@CacheConfig(cacheNames = "commentService")
 public class CommentServiceImpl implements CommentService {
 
     @Resource(name = "mongoTemplate")
@@ -36,7 +35,6 @@ public class CommentServiceImpl implements CommentService {
     ArticlesService articlesService;
 
     @Override
-    @CacheEvict(allEntries = true)
     public Comment save(Comment comment) {
         comment.setCTime(new Date());
         articlesService.updateComments(comment.getAid(),1);
@@ -44,7 +42,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @CacheEvict(allEntries = true)
     public Comment saveReply(Comment comment) {
         comment.setCTime(new Date());
         articlesService.updateComments(comment.getAid(),1);
@@ -57,7 +54,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Cacheable(key = "#aid + '_' + #index + '_' + #size")
     public PageImpl<Comment> getCommentByPage(int aid,int index, int size) {
         Pageable pageable = PageRequest.of(index,size);
         Query query = new Query(Criteria.where("aid").is(aid)).with(new Sort(Sort.Direction.DESC,"cTime"));

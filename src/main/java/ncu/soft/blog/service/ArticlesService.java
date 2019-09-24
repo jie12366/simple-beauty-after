@@ -23,7 +23,7 @@ public interface ArticlesService {
      * @param aid 文章id
      * @param uid 用户id
      */
-    void delete(int aid,int uid);
+    void delete(int aid,String uid);
 
     /**
      * 分页查询所有数据
@@ -40,7 +40,7 @@ public interface ArticlesService {
      * @param uid 用户id
      * @return PageImpl<Article>
      */
-    PageImpl<Article> getArticlesByUidByPage(int pageIndex,int pageSize,int uid);
+    PageImpl<Article> getArticlesByUidByPage(int pageIndex,int pageSize,String uid);
 
     /**
      * 根据aid获取文章数据
@@ -81,7 +81,7 @@ public interface ArticlesService {
      * @param tag 文章标签
      * @return PageImpl
      */
-    PageImpl<Article> getArticleByTag(int index,int size,int uid,String tag);
+    PageImpl<Article> getArticleByTag(int index,int size,String uid,String tag);
 
     /**
      * 获取用户指定标签的文章
@@ -91,7 +91,7 @@ public interface ArticlesService {
      * @param category 文章分类
      * @return PageImpl
      */
-    PageImpl<Article> getArticleByCategory(int index,int size,int uid,String category);
+    PageImpl<Article> getArticleByCategory(int index,int size,String uid,String category);
 
     /**
      * 获取用户指定归档的文章
@@ -101,5 +101,5 @@ public interface ArticlesService {
      * @param archive 文章归档
      * @return PageImpl
      */
-    PageImpl<Article> getArticleByArchive(int index,int size,int uid,String archive);
+    PageImpl<Article> getArticleByArchive(int index,int size,String uid,String archive);
 }

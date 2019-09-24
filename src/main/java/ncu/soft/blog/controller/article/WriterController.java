@@ -55,7 +55,7 @@ public class WriterController {
     @ApiOperation("将文章信息存入数据库")
     @PostMapping("/articles")
     @LoginToken
-    public JsonResult saveArticles(@Valid @RequestParam("uid") int uid, @RequestParam("title") String title,
+    public JsonResult saveArticles(@Valid @RequestParam("uid") String uid, @RequestParam("title") String title,
                                    @RequestParam("category") String category, @RequestParam("tags") String tags,@RequestParam("pwd")String pwd,
                                    @RequestParam("contentMd") String contentMd,@RequestParam("contentHtml")String contentHtml,@RequestParam("aid") int aid){
         // 解析json字符串为list集合
@@ -103,7 +103,7 @@ public class WriterController {
 
     @ApiOperation("获取用户所有个人分类")
     @GetMapping("/categorys/{uid}")
-    public JsonResult getCategorys(@Valid @PathVariable("uid") int uid){
+    public JsonResult getCategorys(@Valid @PathVariable("uid") String uid){
         MyTag myTag = tagService.findByUid(uid);
         if (myTag != null){
             return JsonResult.success(myTag.getCategorys());

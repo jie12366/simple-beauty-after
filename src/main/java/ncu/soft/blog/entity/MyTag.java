@@ -34,7 +34,7 @@ public class MyTag implements Serializable {
      * 用户id
      */
     @Indexed
-    private int uid;
+    private String uid;
 
     /**
      * 用户的个人标签与标签对应的文章数

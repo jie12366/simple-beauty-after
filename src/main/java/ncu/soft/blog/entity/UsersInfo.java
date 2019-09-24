@@ -34,7 +34,7 @@ public class UsersInfo implements Serializable {
      * 用户id
      */
     @Indexed
-    private int uid;
+    private String uid;
 
     /**
      * 我的昵称
@@ -87,7 +87,7 @@ public class UsersInfo implements Serializable {
      */
     private int articles;
 
-    public UsersInfo(int uid, String nickName, String phone, String headPath, int attentions, int fans, int likes, int reads, int articles) {
+    public UsersInfo(String uid, String nickName, String phone, String headPath, int attentions, int fans, int likes, int reads, int articles) {
         this.uid = uid;
         this.nickName = nickName;
         this.phone = phone;
@@ -99,7 +99,7 @@ public class UsersInfo implements Serializable {
         this.articles = articles;
     }
 
-    public UsersInfo(int uid, String nickName, String headPath, int attentions, int fans, int likes, int reads, int articles) {
+    public UsersInfo(String uid, String nickName, String headPath, int attentions, int fans, int likes, int reads, int articles) {
         this.uid = uid;
         this.nickName = nickName;
         this.headPath = headPath;

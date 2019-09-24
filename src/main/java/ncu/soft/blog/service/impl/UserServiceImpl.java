@@ -23,14 +23,12 @@ import javax.annotation.Resource;
  * @date 2019/8/16 21:32
  */
 @Service
-@CacheConfig(cacheNames = "userService")
 public class UserServiceImpl implements UserService {
 
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
     @Override
-    @Cacheable(key = "#id")
     public Users findById(int id){
         return mongoTemplate.findById(id,Users.class);
     }
@@ -41,7 +39,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(key = "#users.id")
     public Users save(Users users) {
         String secret = GetString.getMd5(users.getUPwd());
         users.setUPwd(secret);
@@ -56,7 +53,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(allEntries = true)
     public Users updatePwd(String email, String pwd) {
         String secret = GetString.getMd5(pwd);
         UsersInfo usersInfo = mongoTemplate.findOne(new Query(Criteria.where("email").is(email)),UsersInfo.class);

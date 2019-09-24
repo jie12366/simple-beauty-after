@@ -1,6 +1,5 @@
 package ncu.soft.blog.service.impl;
 
-import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.UsersInfo;
 import ncu.soft.blog.service.UsersInfoService;
 import org.springframework.cache.annotation.CacheConfig;
@@ -21,27 +20,23 @@ import javax.annotation.Resource;
  * @date 2019/8/24 13:19
  */
 @Service
-@CacheConfig(cacheNames = "usersInfoService")
 public class UsersInfoServiceImpl implements UsersInfoService {
 
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
     @Override
-    @Cacheable(key = "#uid")
-    public UsersInfo findByUid(int uid) {
+    public UsersInfo findByUid(String uid) {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),UsersInfo.class);
     }
 
     @Override
-    @CachePut(key = "#usersInfo.uid")
     public UsersInfo save(UsersInfo usersInfo) {
         return mongoTemplate.insert(usersInfo);
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateHeadPath(String headPath, int uid) {
+    public UsersInfo updateHeadPath(String headPath, String uid) {
         Query query = new Query(Criteria.where("uid").is(uid));
         Update update = Update.update("headPath",headPath);
         //设置returnNew为true，返回更新后的数据
@@ -50,8 +45,7 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo bindEmail(String email, int uid) {
+    public UsersInfo bindEmail(String email, String uid) {
         Query query = new Query(Criteria.where("uid").is(uid));
         Update update = Update.update("email",email);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
@@ -64,8 +58,7 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateInfo(String nickname, String introduction, int uid) {
+    public UsersInfo updateInfo(String nickname, String introduction, String uid) {
         Query query = new Query(Criteria.where("uid").is(uid));
         Update update = Update.update("nickName",nickname).set("introduction",introduction);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
@@ -73,32 +66,27 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateArticles(int articles, int uid) {
+    public UsersInfo updateArticles(int articles, String uid) {
         return updateNumber(uid,"articles",articles);
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateReads(int reads, int uid) {
+    public UsersInfo updateReads(int reads, String uid) {
         return updateNumber(uid,"reads",1);
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateFans(int fans, int uid) {
+    public UsersInfo updateFans(int fans, String uid) {
         return updateNumber(uid,"fans",fans);
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateLikes(int likes, int uid) {
+    public UsersInfo updateLikes(int likes, String uid) {
         return updateNumber(uid,"likes",likes);
     }
 
     @Override
-    @CachePut(key = "#uid")
-    public UsersInfo updateAttentions(int attentions, int uid) {
+    public UsersInfo updateAttentions(int attentions, String uid) {
         return updateNumber(uid,"attentions",attentions);
     }
 
@@ -109,7 +97,7 @@ public class UsersInfoServiceImpl implements UsersInfoService {
      * @param num 更新的数量
      * @return Article
      */
-    private UsersInfo updateNumber(int uid, String key,int num){
+    private UsersInfo updateNumber(String uid, String key,int num){
         Query query = new Query(Criteria.where("uid").is(uid));
         Update update = new Update().inc(key,num);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);

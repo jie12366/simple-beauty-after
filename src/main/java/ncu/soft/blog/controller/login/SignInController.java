@@ -7,6 +7,7 @@ import ncu.soft.blog.service.UsersInfoService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.JwtUtil;
 import ncu.soft.blog.utils.ResultCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,10 +67,11 @@ public class SignInController {
 
     @ApiOperation("账号注销")
     @DeleteMapping("/logout/{uid}")
-    public JsonResult logout(@Valid @PathVariable("uid")int uid, HttpServletRequest request){
+    public JsonResult logout(@Valid @PathVariable("uid")String uid, HttpServletRequest request){
         //从http请求头中取出token
         String token = request.getHeader("Authorization");
-        if (userService.findById(uid) == null){
+        // 如果uid不全是数字（说明是QQ登录的id），或者不存在这个账号，那么就是第三方登录
+        if (!StringUtils.isNumeric(uid) || userService.findById(Integer.parseInt(uid)) == null){
             if (usersInfoService.findByUid(uid) == null){
                 return JsonResult.failure(ResultCode.USER_NOT_EXIST);
             }else {

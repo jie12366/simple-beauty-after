@@ -37,7 +37,7 @@ public class PhotoController {
     @PostMapping("/photos")
     @LoginToken
     public JsonResult savePhotos(@Valid HttpServletRequest request, @RequestParam("img") MultipartFile img,
-                                 @RequestParam("alt") String alt, @RequestParam("uid") int uid){
+                                 @RequestParam("alt") String alt, @RequestParam("uid") String uid){
         try {
             String url = uploadService.getPath(request,img);
             Photo photo = new Photo(url,alt,new Date());
@@ -55,7 +55,7 @@ public class PhotoController {
     @PutMapping("/photos")
     @LoginToken
     public JsonResult updatePhotos(@Valid HttpServletRequest request, @RequestParam("img") MultipartFile img,
-                                   @RequestParam("alt") String alt,@RequestParam("uid") int uid){
+                                   @RequestParam("alt") String alt,@RequestParam("uid") String uid){
         try {
             String url = uploadService.getPath(request,img);
             Photo photo = new Photo(url,alt,new Date());
@@ -76,7 +76,7 @@ public class PhotoController {
     @ApiOperation("删除照片")
     @DeleteMapping("/photo/{key}/{uid}")
     @LoginToken
-    public JsonResult deletePhoto(@Valid @PathVariable("key") String key,@PathVariable("uid") int uid){
+    public JsonResult deletePhoto(@Valid @PathVariable("key") String key,@PathVariable("uid") String uid){
         try {
             uploadService.deleteFile(key);
         } catch (QiniuException e) {
@@ -92,7 +92,7 @@ public class PhotoController {
 
     @ApiOperation("获取照片集")
     @GetMapping("/photos/{uid}")
-    public JsonResult getPhotos(@Valid @PathVariable("uid")int uid){
+    public JsonResult getPhotos(@Valid @PathVariable("uid")String uid){
         Photos photos = photosService.getPhotos(uid);
         if (photos == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.mail.internet.InternetAddress;
 import javax.validation.Valid;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -54,7 +53,7 @@ public class ShowController {
 
     @ApiOperation("我的主页分页展示我的文章")
     @GetMapping("/articles/{uid}/{index}/{size}")
-    public JsonResult getArticlesByUid(@Valid @PathVariable("uid")int uid, @PathVariable("index")int index,@PathVariable("size") int size){
+    public JsonResult getArticlesByUid(@Valid @PathVariable("uid")String uid, @PathVariable("index")int index,@PathVariable("size") int size){
         PageImpl<Article> articles = articlesService.getArticlesByUidByPage(index,size,uid);
         if (!articles.isEmpty()){
             return JsonResult.success(articles);
@@ -92,7 +91,7 @@ public class ShowController {
                     // 更新文章阅读量，+1
                     articlesService.updateReads(aid,1);
                     // 更新个人访问，+1
-                    usersInfoService.updateReads(1,article.getUid());
+                    usersInfoService.updateReads(1,String.valueOf(article.getUid()));
                 }
             }else {
                 // 将点赞这篇文章的uid放进集合中
@@ -102,7 +101,7 @@ public class ShowController {
                 // 更新文章阅读量，+1
                 articlesService.updateReads(aid,1);
                 // 更新个人访问，+1
-                usersInfoService.updateReads(1,article.getUid());
+                usersInfoService.updateReads(1,String.valueOf(article.getUid()));
             }
             return JsonResult.success(article);
         }else {
@@ -112,7 +111,7 @@ public class ShowController {
 
     @ApiOperation("获取我的所有标签")
     @GetMapping("/tags/{uid}")
-    public JsonResult getAllTags(@Valid @PathVariable("uid") int uid){
+    public JsonResult getAllTags(@Valid @PathVariable("uid") String uid){
         MyTag myTag = tagService.getAllTags(uid);
         if (myTag == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -123,7 +122,7 @@ public class ShowController {
 
     @ApiOperation("根据我的标签分页获取文章")
     @GetMapping("/articles/{uid}/tag/{tag}/{index}/{size}")
-    public JsonResult getArticlesByTag(@Valid @PathVariable("uid")int uid,@PathVariable("tag")String  tag,
+    public JsonResult getArticlesByTag(@Valid @PathVariable("uid")String uid,@PathVariable("tag")String  tag,
                                        @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByTag(index,size,uid,tag);
         if (articles.isEmpty()){
@@ -135,7 +134,7 @@ public class ShowController {
 
     @ApiOperation("根据我的分类分页获取文章")
     @GetMapping("/articles/{uid}/category/{category}/{index}/{size}")
-    public JsonResult getArticlesByCategory(@Valid @PathVariable("uid")int uid,@PathVariable("category")String  category,
+    public JsonResult getArticlesByCategory(@Valid @PathVariable("uid")String uid,@PathVariable("category")String  category,
                                        @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByCategory(index,size,uid,category);
         if (articles.isEmpty()){
@@ -147,7 +146,7 @@ public class ShowController {
 
     @ApiOperation("获取我的所有归档")
     @GetMapping("/archives/{uid}")
-    public JsonResult getAllArchives(@Valid @PathVariable("uid") int uid){
+    public JsonResult getAllArchives(@Valid @PathVariable("uid") String uid){
         Map<String , Integer> archives = tagService.getAllArchives(uid);
         if (archives == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -158,7 +157,7 @@ public class ShowController {
 
     @ApiOperation("根据我的归档分页获取文章")
     @GetMapping("/articles/{uid}/archive/{archive}/{index}/{size}")
-    public JsonResult getArticlesByDate(@Valid @PathVariable("uid")int uid,@PathVariable("archive")String  archive,
+    public JsonResult getArticlesByDate(@Valid @PathVariable("uid")String uid,@PathVariable("archive")String  archive,
                                             @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByArchive(index,size,uid,archive);
         if (articles.isEmpty()){

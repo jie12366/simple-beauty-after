@@ -6,6 +6,7 @@ import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.Comment;
 import ncu.soft.blog.entity.Message;
 import ncu.soft.blog.entity.UsersInfo;
+import ncu.soft.blog.selfAnnotation.LoginToken;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.CommentService;
 import ncu.soft.blog.service.MessageService;
@@ -46,6 +47,7 @@ public class CommentController {
 
     @ApiOperation("将评论存入")
     @PostMapping("/comments")
+    @LoginToken
     public JsonResult saveComments(@Valid @RequestParam("aid")int aid,@RequestParam("uid") String uid,
                                    @RequestParam("toUid") String toUid,@RequestParam("content") String content){
         Comment comment = new Comment(aid,uid,content);
@@ -59,6 +61,7 @@ public class CommentController {
 
     @ApiOperation("将评论回复存入")
     @PostMapping("/replyComments")
+    @LoginToken
     public JsonResult saveReply(@Valid @RequestParam("aid")int aid,@RequestParam("uid")String uid,@RequestParam("rUid")String rUid,
                                 @RequestParam("content")String content,@RequestParam("rContent")String rContent){
         Comment comment = new Comment(aid,uid,rUid,content,rContent);

@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author www.xyjz123.xyz
@@ -169,6 +170,12 @@ public class ArticlesServiceImpl implements ArticlesService {
         Date endDate = DateUtil.parse(year + "-" + endMonth + "-01" + " 08","yyyy-MM-dd HH");
         Query query = new Query(Criteria.where("uid").is(uid).and("aTime").gte(startDate).lte(endDate));
         query.with(new Sort(Sort.Direction.DESC,"aTime"));
+        return getArticles(index,size,query);
+    }
+
+    @Override
+    public PageImpl<Article> getArticleByRegex(int index, int size, String regex) {
+        Query query = new Query(Criteria.where("title").regex(".*?" + regex + ".*"));
         return getArticles(index,size,query);
     }
 

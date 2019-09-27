@@ -102,4 +102,13 @@ public interface ArticlesService {
      * @return PageImpl
      */
     PageImpl<Article> getArticleByArchive(int index,int size,String uid,String archive);
+
+    /**
+     * 模糊匹配文章列表
+     * @param index 当前页
+     * @param size 每页大小
+     * @param regex 正则表达式
+     * @return PageImpl<Article>
+     */
+    PageImpl<Article> getArticleByRegex(int index, int size, String regex);
 }

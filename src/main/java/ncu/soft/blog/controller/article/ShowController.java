@@ -1,5 +1,7 @@
 package ncu.soft.blog.controller.article;
 
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
@@ -12,15 +14,18 @@ import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author www.xyjz123.xyz
@@ -44,6 +49,10 @@ public class ShowController {
 
     @Resource
     SetOperations<String,String> setOperations;
+
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(10,10,
+            0L,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<>(255),
+            new ThreadFactoryBuilder().setNameFormat("res-%d").build());
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -160,6 +169,46 @@ public class ShowController {
     public JsonResult getArticlesByDate(@Valid @PathVariable("uid")String uid,@PathVariable("archive")String  archive,
                                             @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByArchive(index,size,uid,archive);
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(articles);
+        }
+    }
+
+    @ApiOperation("模糊匹配文章标题")
+    @GetMapping("/title/regex/{regex}/{index}/{size}")
+    public JsonResult getTitleByRegex(@Valid @PathVariable("regex")String regex,
+                                        @PathVariable("index")int index,@PathVariable("size")int size){
+        PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            List<JSONObject> result = new ArrayList<>();
+            for (Article article : articles.getContent()){
+                // 使用多线程加快处理速度
+                executor.execute(() ->{
+                    JSONObject json = new JSONObject();
+                    // 取出标题返回给前端
+                    json.put("value",article.getTitle());
+                    result.add(json);
+                });
+            }
+            // 等待多线程所有任务运行结束
+            while (result.size() == articles.getContent().size()){
+                if (executor.isTerminated()){
+                    break;
+                }
+            }
+            return JsonResult.success(result);
+        }
+    }
+
+    @ApiOperation("模糊匹配文章")
+    @PostMapping("/article/regex")
+    public JsonResult getArticleByRegex(@Valid @RequestParam("regex")String regex,
+                                        @RequestParam("index")int index,@RequestParam("size")int size){
+        PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
         if (articles.isEmpty()){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
         }else {

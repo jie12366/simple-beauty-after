@@ -5,8 +5,10 @@ import com.zhenzi.sms.ZhenziSmsClient;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Users;
 import ncu.soft.blog.entity.UsersInfo;
+import ncu.soft.blog.entity.UsersTheme;
 import ncu.soft.blog.service.UserService;
 import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.service.UsersThemeService;
 import ncu.soft.blog.utils.GetString;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
@@ -15,8 +17,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
@@ -37,11 +37,14 @@ public class SignUpController {
     @Resource
     ValueOperations<String ,Object> valueOperations;
 
+    @Resource
+    UsersThemeService usersThemeService;
+
     private final static String SMS = "smsCaptcha";
 
     @ApiOperation("发送短信验证码")
     @PostMapping("/phone")
-    public JsonResult sendMsg(HttpServletRequest request, HttpServletResponse response, @RequestParam("phone") String phone) throws Exception{
+    public JsonResult sendMsg(@RequestParam("phone") String phone) throws Exception{
         System.out.println(phone);
         String code = GetString.getCode();
         System.out.println("code = " + code);
@@ -80,6 +83,10 @@ public class SignUpController {
         UsersInfo usersInfo = new UsersInfo(String.valueOf(users1.getId()),users.getUAccount(),users.getUAccount(),
                 "http://cdn.jie12366.xyz/head_boy.png",0,0,0,0,0);
         usersInfoService.save(usersInfo);
+        // 初始化默认主题
+        UsersTheme usersTheme = new UsersTheme(String.valueOf(users1.getId()), "http://cdn.jie12366.xyz/dog.jpg",
+                "http://cdn.jie12366.xyz/sky.png","ir-black");
+        usersThemeService.save(usersTheme);
         return JsonResult.success();
     }
 

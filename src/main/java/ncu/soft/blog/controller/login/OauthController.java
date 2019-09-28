@@ -12,7 +12,9 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import ncu.soft.blog.entity.UsersInfo;
+import ncu.soft.blog.entity.UsersTheme;
 import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.service.UsersThemeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,9 @@ public class OauthController {
     private final AuthRequestFactory factory;
 
     private final UsersInfoService usersInfoService;
+
+    @Resource
+    UsersThemeService usersThemeService;
 
     @Resource
     private ValueOperations<String,String > valueOperations;
@@ -78,6 +83,10 @@ public class OauthController {
             UsersInfo usersInfo = new UsersInfo(uid,data.getString("username"),
                     data.getString("avatar"),0,0,0,0,0);
             usersInfoService.save(usersInfo);
+            // 初始化默认主题
+            UsersTheme usersTheme = new UsersTheme(uid, "http://cdn.jie12366.xyz/dog.jpg",
+                    "http://cdn.jie12366.xyz/sky.png","ir-black");
+            usersThemeService.save(usersTheme);
         }
         // 传给前端的数据
         JSONObject res = new JSONObject();

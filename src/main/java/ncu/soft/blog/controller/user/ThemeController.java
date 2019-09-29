@@ -77,4 +77,14 @@ public class ThemeController {
         }
         return JsonResult.failure(ResultCode.UPDATE_ERROR);
     }
+
+    @ApiOperation("还原主题设置")
+    @DeleteMapping("/setting/{uid}")
+    public JsonResult revertSetting(@Valid @PathVariable("uid") String uid){
+        UsersTheme usersTheme = usersThemeService.revert(uid);
+        if (usersTheme != null){
+            return JsonResult.success(usersTheme);
+        }
+        return JsonResult.failure(ResultCode.UPDATE_ERROR);
+    }
 }

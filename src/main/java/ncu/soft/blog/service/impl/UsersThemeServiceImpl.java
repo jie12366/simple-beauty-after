@@ -47,7 +47,16 @@ public class UsersThemeServiceImpl implements UsersThemeService {
         return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),UsersTheme.class);
     }
 
-    private UsersTheme update(String key,String value, String uid){
+    @Override
+    public UsersTheme revert(String uid) {
+        Query query = new Query(Criteria.where("uid").is(uid));
+        Update update = new Update().set("index","http://cdn.jie12366.xyz/dog.jpg").set("side","http://cdn.jie12366.xyz/sky.png")
+                .set("style","paraiso-light");
+        FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+        return mongoTemplate.findAndModify(query,update,options, UsersTheme.class);
+    }
+
+    private UsersTheme update(String key, String value, String uid){
         Query query = new Query(Criteria.where("uid").is(uid));
         Update update = new Update().set(key,value);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);

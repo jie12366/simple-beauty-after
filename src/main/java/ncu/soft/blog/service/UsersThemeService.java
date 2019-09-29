@@ -46,4 +46,10 @@ public interface UsersThemeService {
      * @return UsersTheme
      */
     UsersTheme getTheme(String uid);
+
+    /**
+     * 还原设置
+     * @param uid 用户id
+     */
+    UsersTheme revert(String uid);
 }

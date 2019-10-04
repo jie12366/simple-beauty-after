@@ -111,4 +111,14 @@ public interface ArticlesService {
      * @return PageImpl<Article>
      */
     PageImpl<Article> getArticleByRegex(int index, int size, String regex);
+
+    /**
+     * 根据用户id模糊匹配文章列表
+     * @param index 当前页
+     * @param size 每页大小
+     * @param regex 正则表达式
+     * @param uid 用户id
+     * @return PageImpl<Article>
+     */
+    PageImpl<Article> getArticleByRegexByUid(int index, int size, String regex,String uid);
 }

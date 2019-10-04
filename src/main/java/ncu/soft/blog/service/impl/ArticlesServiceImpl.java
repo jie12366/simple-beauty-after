@@ -179,6 +179,12 @@ public class ArticlesServiceImpl implements ArticlesService {
         return getArticles(index,size,query);
     }
 
+    @Override
+    public PageImpl<Article> getArticleByRegexByUid(int index, int size, String regex, String uid) {
+        Query query = new Query(Criteria.where("uid").is(uid).and("title").regex(".*?" + regex + ".*"));
+        return getArticles(index,size,query);
+    }
+
     /**
      * 分页方法
      * @param index 当前页

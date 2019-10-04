@@ -215,4 +215,16 @@ public class ShowController {
             return JsonResult.success(articles);
         }
     }
+
+    @ApiOperation("站内文章模糊搜索")
+    @GetMapping("/article/{regex}/{uid}/{index}/{size}")
+    public JsonResult getArticleByRegex(@Valid @PathVariable("regex")String regex,@PathVariable("uid")String uid,
+                                        @PathVariable("index")int index,@PathVariable("size")int size){
+        PageImpl<Article> articles = articlesService.getArticleByRegexByUid(index, size, regex, uid);
+        if (articles.isEmpty()){
+            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
+        }else {
+            return JsonResult.success(articles);
+        }
+    }
 }

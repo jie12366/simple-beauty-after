@@ -85,7 +85,7 @@ public class OauthController {
             usersInfoService.save(usersInfo);
             // 初始化默认主题
             UsersTheme usersTheme = new UsersTheme(uid, "http://cdn.jie12366.xyz/dog.jpg",
-                    "http://cdn.jie12366.xyz/sky.png","ir-black");
+                    "http://cdn.jie12366.xyz/sky.png","paraiso-light");
             usersThemeService.save(usersTheme);
         }
         // 传给前端的数据

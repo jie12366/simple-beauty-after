@@ -85,7 +85,7 @@ public class SignUpController {
         usersInfoService.save(usersInfo);
         // 初始化默认主题
         UsersTheme usersTheme = new UsersTheme(String.valueOf(users1.getId()), "http://cdn.jie12366.xyz/dog.jpg",
-                "http://cdn.jie12366.xyz/sky.png","ir-black");
+                "http://cdn.jie12366.xyz/sky.png","paraiso-light");
         usersThemeService.save(usersTheme);
         return JsonResult.success();
     }

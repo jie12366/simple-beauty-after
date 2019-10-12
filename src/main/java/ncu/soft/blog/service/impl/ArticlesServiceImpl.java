@@ -58,9 +58,6 @@ public class ArticlesServiceImpl implements ArticlesService {
     public Article save(Article article,String contentHtml,int aid) {
 
         Date date = new Date();
-        MyTag myTag = tagService.findByUid(article.getUid());
-        //存入或更新标签（分类）
-        addTag(myTag,article.getTags(),article.getCategory(),article.getUid(),date);
 
         //去除html标签和空格，取前70字为文章摘要
         String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,70) + "...";
@@ -84,6 +81,10 @@ public class ArticlesServiceImpl implements ArticlesService {
         if (aid == 0){
             return mongoTemplate.insert(article);
         }else if (aid > 0){
+            MyTag myTag = tagService.findByUid(article.getUid());
+            //存入或更新标签（分类）
+            addTag(myTag,article.getTags(),article.getCategory(),article.getUid(),date);
+
             Update update = Update.update("category",article.getCategory()).set("tags",article.getTags())
                     .set("cPath",coverPath).set("title",article.getTitle()).set("summary",summary)
                     .set("aTime",date).set("pwd",article.getPwd());

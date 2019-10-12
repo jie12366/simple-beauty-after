@@ -88,7 +88,6 @@ public class WriterController {
         ArticleDetail articleDetail1 = null;
         if (aid > 0){
             articleDetail1 = detailService.update(articleDetail);
-            System.out.println(articleDetail1.getContentHtml());
         }else {
             articleDetail1 = detailService.save(articleDetail);
         }

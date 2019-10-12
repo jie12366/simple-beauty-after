@@ -58,6 +58,9 @@ public class ArticlesServiceImpl implements ArticlesService {
     public Article save(Article article,String contentHtml,int aid) {
 
         Date date = new Date();
+        MyTag myTag = tagService.findByUid(article.getUid());
+        //存入标签（分类）
+        addTag(myTag,article.getTags(),article.getCategory(),article.getUid(),date);
 
         //去除html标签和空格，取前70字为文章摘要
         String summary = "摘要：" + RemoveHtmlTags.removeHtmlTags(contentHtml).substring(0,70) + "...";
@@ -81,9 +84,8 @@ public class ArticlesServiceImpl implements ArticlesService {
         if (aid == 0){
             return mongoTemplate.insert(article);
         }else if (aid > 0){
-            MyTag myTag = tagService.findByUid(article.getUid());
-            //存入或更新标签（分类）
-            addTag(myTag,article.getTags(),article.getCategory(),article.getUid(),date);
+            // 删除文章原来的标签（前面已经添加了新的）
+            removeMyTag(aid);
 
             Update update = Update.update("category",article.getCategory()).set("tags",article.getTags())
                     .set("cPath",coverPath).set("title",article.getTitle()).set("summary",summary)
@@ -99,10 +101,7 @@ public class ArticlesServiceImpl implements ArticlesService {
         // 更新文章数
         usersInfoService.updateArticles(-1,String.valueOf(uid));
         // 更新标签、分类、归档
-        Article article = getArticle(aid);
-        MyTag myTag = tagService.findByUid(article.getUid());
-        String archive = DateUtil.format(article.getArticleTime(),"yyyy-MM");
-        removeTag(myTag,article.getTags(),article.getCategory(),archive);
+        removeMyTag(aid);
         // 删除文章对应的评论
         commentService.delete(aid);
         //删除文章详情
@@ -292,6 +291,17 @@ public class ArticlesServiceImpl implements ArticlesService {
         updateRemoveMap(archives,archive);
         myTag.setArchives(archives);
         tagService.update(myTag);
+    }
+
+    /**
+     * 根据文章id删除文章对应的标签、分类和归档
+     * @param aid 文章id
+     */
+    private void removeMyTag(int aid){
+        Article article = getArticle(aid);
+        MyTag myTag = tagService.findByUid(article.getUid());
+        String archive = DateUtil.format(article.getArticleTime(),"yyyy-MM");
+        removeTag(myTag,article.getTags(),article.getCategory(),archive);
     }
 
     /**

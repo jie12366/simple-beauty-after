@@ -165,7 +165,8 @@ public class ArticlesServiceImpl implements ArticlesService {
         // 获取下一个月
         int endMonth = month + 1;
         // 重组年月日，获取某个月的开始时间和截止时间
-        Date startDate = DateUtil.parse(year + "-" + month + "-01","yyyy-MM-dd");
+        // 开始时间是这个月的八点
+        Date startDate = DateUtil.parse(year + "-" + month + "-01" + " 08","yyyy-MM-dd HH");
         // 因为iso时间要晚8个小时，所以结束时间是下个月月初的八点
         Date endDate = DateUtil.parse(year + "-" + endMonth + "-01" + " 08","yyyy-MM-dd HH");
         Query query = new Query(Criteria.where("uid").is(uid).and("aTime").gte(startDate).lte(endDate));

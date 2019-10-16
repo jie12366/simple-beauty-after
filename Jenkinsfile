@@ -15,7 +15,7 @@ pipeline {
     stage('获取镜像') {
       steps {
         echo 'get image'
-        sh 'docker login --username=熊义杰的docker registry.cn-hangzhou.aliyuncs.com --password=LOVEjie@1111'
+        sh 'docker login --username=熊义杰的docker registry.cn-hangzhou.aliyuncs.com --password=******'
         sh 'docker pull registry.cn-hangzhou.aliyuncs.com/jie12366/simple-beauty:1.0'
       }
     }

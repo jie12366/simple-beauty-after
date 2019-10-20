@@ -1,11 +1,10 @@
 package ncu.soft.blog.config;
 
-import com.google.gson.Gson;
-import ncu.soft.blog.utils.QiniuUtil;
-import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import ncu.soft.blog.utils.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.annotation.Resource;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 
@@ -33,7 +33,7 @@ public class FileUploadConfig {
     /**
      * 七牛云配置
      */
-    @Autowired
+    @Resource
     private QiniuUtil qiNiuProperties;
     private final MultipartProperties multipartProperties;
 
@@ -70,7 +70,7 @@ public class FileUploadConfig {
     @Bean
     public com.qiniu.storage.Configuration qiniuConfig() {
         //华东
-        return new com.qiniu.storage.Configuration(Zone.zone0());
+        return new com.qiniu.storage.Configuration(Region.region0());
     }
 
     /**
@@ -98,15 +98,5 @@ public class FileUploadConfig {
     @Bean
     public BucketManager bucketManager() {
         return new BucketManager(auth(), qiniuConfig());
-    }
-
-    /**
-     * 配置gson为json解析工具
-     *
-     * @return
-     */
-    @Bean
-    public Gson gson() {
-        return new Gson();
     }
 }

@@ -52,6 +52,8 @@ public class ArticleDetail implements Serializable {
 
     /**
      * 文章目录
+     *
+     *
      */
     private List<Map<String ,String >> directory;
 }

@@ -1,6 +1,6 @@
 package ncu.soft.blog.service.impl;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -63,12 +63,12 @@ public class UploadServiceImpl implements UploadService, InitializingBean {
         file.transferTo(destFile);
         Response response = uploadFile(destFile);
         //解析上传成功的结果
-        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+        DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
         return  "http://cdn.jie12366.xyz/" + putRet.key;
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet(){
         this.putPolicy = new StringMap();
         putPolicy.put("returnBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"width\":$(imageInfo.width), \"height\":${imageInfo.height}}");
     }

@@ -6,10 +6,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -75,12 +71,12 @@ public class DetailServiceImpl implements DetailService {
             if (element.is("h2")) {
                 Map<String ,String> h = new HashMap<>(1);
                 h.put("h2",element.text());
-                h.put("id",element.select("a").attr("id"));
+                h.put("id",element.attr("id"));
                 directory.add(h);
             } else if (element.is("h3")){
                 Map<String ,String> h = new HashMap<>(1);
                 h.put("h3",element.text());
-                h.put("id",element.select("a").attr("id"));
+                h.put("id",element.attr("id"));
                 directory.add(h);
             }
         }

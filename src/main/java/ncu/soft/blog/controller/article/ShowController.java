@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -84,10 +85,9 @@ public class ShowController {
 
     @ApiOperation("获取文章数据")
     @GetMapping("/article/{aid}")
-    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid) throws UnknownHostException {
-        // 获取本机ip
-        InetAddress address = InetAddress.getLocalHost();
-        String ip = address.getHostAddress();
+    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) throws UnknownHostException {
+        // 获取访问者真实ip
+        String ip = getIp(request);
 
         Article article = articlesService.getArticle(aid);
         if (article != null){
@@ -226,5 +226,33 @@ public class ShowController {
         }else {
             return JsonResult.success(articles);
         }
+    }
+
+    private final static String UNKNOWN = "unknown";
+
+    /**
+     * 获取访问用户的真实ip
+     * @param request HttpServletRequest
+     * @return 获取到的ip地址
+     */
+    private String getIp(HttpServletRequest request){
+        String ip = request.getHeader("x-forwarded-for");
+        // 获取用户的真实ip地址（避免用户使用了多级代理而取不到真实ip）
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 }

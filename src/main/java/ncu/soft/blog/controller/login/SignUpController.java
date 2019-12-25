@@ -50,7 +50,7 @@ public class SignUpController {
         System.out.println("code = " + code);
         // 榛子短信的SDK
         // 连接榛子云需要的信息
-        ZhenziSmsClient client = new ZhenziSmsClient("https://sms_developer.zhenzikj.com", "101348", "******");
+        ZhenziSmsClient client = new ZhenziSmsClient("https://sms_developer.zhenzikj.com", "101348", "ZGZmNjM3MWYtZDVjMS00YWUyLWE4NmUtZDI5NjNmOGRjNTA1");
         String result = client.send(phone, "您的验证码为" + code + "\n" + "如果不是本人操作，请忽略。");
         JSONObject jsonObject = JSONObject.parseObject(result);
         if ((Integer) jsonObject.get("code") != 0){

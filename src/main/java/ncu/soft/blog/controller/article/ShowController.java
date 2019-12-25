@@ -3,6 +3,7 @@ package ncu.soft.blog.controller.article;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
+import ncu.soft.blog.entity.ArticleAndUserVo;
 import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.DetailService;
@@ -70,7 +71,7 @@ public class ShowController {
     public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) {
         // 获取访问者真实ip
         String ip = articlesService.getIp(request);
-        Article article = articlesService.getArticle(aid, ip);
+        ArticleAndUserVo article = articlesService.getArticle(aid, ip);
         if (article != null){
             return JsonResult.success(article);
         }else {
@@ -140,15 +141,15 @@ public class ShowController {
     @GetMapping("/title/regex/{regex}/{index}/{size}")
     public JsonResult getTitleByRegex(@Valid @PathVariable("regex")String regex,
                                         @PathVariable("index")int index,@PathVariable("size")int size){
-        PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
+        List<ArticleAndUserVo> articles = articlesService.getArticleByRegex(index, size, regex);
         if (articles.isEmpty()){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
         }else {
             List<JSONObject> result = new ArrayList<>();
-            for (Article article : articles.getContent()){
+            for (ArticleAndUserVo article : articles){
                 JSONObject json = new JSONObject();
                 // 取出标题返回给前端
-                json.put("value",article.getTitle());
+                json.put("value",article.getArticle().getTitle());
                 result.add(json);
             }
             return JsonResult.success(result);
@@ -159,7 +160,7 @@ public class ShowController {
     @PostMapping("/article/regex")
     public JsonResult getArticleByRegex(@Valid @RequestParam("regex")String regex,
                                         @RequestParam("index")int index,@RequestParam("size")int size){
-        PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
+        List<ArticleAndUserVo> articles = articlesService.getArticleByRegex(index, size, regex);
         if (articles.isEmpty()){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
         }else {

@@ -17,6 +17,13 @@ public interface UsersInfoService {
     UsersInfo findByUid(String uid);
 
     /**
+     * 根据id查找用户昵称
+     * @param uid 用户id
+     * @return 用户昵称
+     */
+    String findNameByUid(String uid);
+
+    /**
      * 将用户信息插入数据库
      * @param usersInfo 用户信息
      */

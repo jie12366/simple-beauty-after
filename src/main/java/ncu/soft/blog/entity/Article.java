@@ -38,16 +38,6 @@ public class Article implements Serializable {
     private String uid;
 
     /**
-     * 用户信息
-     */
-    private UsersInfo usersInfo;
-
-    /**
-     * 文章内容
-     */
-    private ArticleDetail articleDetail;
-
-    /**
      * 文章个人分类
      */
     private String category;

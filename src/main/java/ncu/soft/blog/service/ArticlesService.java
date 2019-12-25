@@ -1,7 +1,10 @@
 package ncu.soft.blog.service;
 
 import ncu.soft.blog.entity.Article;
+import ncu.soft.blog.entity.ArticleAndUserVo;
 import org.springframework.data.domain.PageImpl;
+
+import java.util.List;
 
 /**
  * @author www.xyjz123.xyz
@@ -31,7 +34,7 @@ public interface ArticlesService {
      * @param pageSize 每页大小
      * @return PageImpl
      */
-    PageImpl<Article> getArticlesByPage(int pageIndex,int pageSize);
+    List<ArticleAndUserVo> getArticlesByPage(int pageIndex, int pageSize);
 
     /**
      * 根据用户id分页查询数据
@@ -55,7 +58,7 @@ public interface ArticlesService {
      * @param ip 访问ip
      * @return Article
      */
-    Article getArticle(int aid, String ip);
+    ArticleAndUserVo getArticle(int aid, String ip);
 
     /**
      * 阅读量+1
@@ -118,7 +121,7 @@ public interface ArticlesService {
      * @param regex 正则表达式
      * @return PageImpl<Article>
      */
-    PageImpl<Article> getArticleByRegex(int index, int size, String regex);
+    List<ArticleAndUserVo> getArticleByRegex(int index, int size, String regex);
 
     /**
      * 根据用户id模糊匹配文章列表

@@ -2,6 +2,7 @@ package ncu.soft.blog.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import ncu.soft.blog.entity.Article;
+import ncu.soft.blog.entity.ArticleAndUserVo;
 import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.service.*;
 import ncu.soft.blog.utils.RemoveHtmlTags;
@@ -24,10 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author www.xyjz123.xyz
@@ -112,7 +110,7 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public PageImpl<Article> getArticlesByPage(int pageIndex, int pageSize) {
+    public List<ArticleAndUserVo> getArticlesByPage(int pageIndex, int pageSize) {
         Query query = new Query().with(new Sort(Sort.Direction.DESC,"aTime"));
         // 获取分页信息
         PageImpl<Article> articles = getArticles(pageIndex,pageSize,query);
@@ -131,13 +129,16 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public Article getArticle(int aid, String ip) {
+    public ArticleAndUserVo getArticle(int aid, String ip) {
         Article article = mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
+        ArticleAndUserVo articleAndUserVo = new ArticleAndUserVo();
         if (article != null) {
-            // 设置文章内容
-            article.setArticleDetail(detailService.getArticleByAid(article.getId()));
+            // 设置文章
+            articleAndUserVo.setArticle(article);
+            // 设置文章详情
+            articleAndUserVo.setArticleDetail(detailService.getArticleByAid(article.getId()));
             // 设置用户信息
-            article.setUsersInfo(usersInfoService.findByUid(article.getUid()));
+            articleAndUserVo.setUsersInfo(usersInfoService.findByUid(article.getUid()));
             // 如果文章被阅读过
             if (setOperations.getOperations().hasKey(String.valueOf(aid))) {
                 // 如果该键不存在该元素
@@ -161,7 +162,7 @@ public class ArticlesServiceImpl implements ArticlesService {
                 // 更新个人访问，+1
                 usersInfoService.updateReads(1, String.valueOf(article.getUid()));
             }
-            return article;
+            return articleAndUserVo;
         }else {
             return null;
         }
@@ -215,7 +216,7 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public PageImpl<Article> getArticleByRegex(int index, int size, String regex) {
+    public List<ArticleAndUserVo> getArticleByRegex(int index, int size, String regex) {
         Query query = new Query(Criteria.where("title").regex(".*?" + regex + ".*"));
         PageImpl<Article> articles = getArticles(index,size,query);
         return setUserNickName(articles);
@@ -411,11 +412,18 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param articles 文章分页数据
      * @return 设置作者后的数据
      */
-    private PageImpl<Article> setUserNickName(PageImpl<Article> articles){
+    private List<ArticleAndUserVo> setUserNickName(PageImpl<Article> articles){
+        List<ArticleAndUserVo> articleAndUserVos = new ArrayList<>();
         for (Article article : articles.getContent()){
+            ArticleAndUserVo articleAndUserVo = new ArticleAndUserVo();
+            // 设置总页数
+            articleAndUserVo.setTotal(articles.getTotalPages());
+            // 设置文章
+            articleAndUserVo.setArticle(article);
             // 设置用户昵称
-            article.setUsersInfo(usersInfoService.findByUid(article.getUid()));
+            articleAndUserVo.setNickName(usersInfoService.findNameByUid(article.getUid()));
+            articleAndUserVos.add(articleAndUserVo);
         }
-        return articles;
+        return articleAndUserVos;
     }
 }

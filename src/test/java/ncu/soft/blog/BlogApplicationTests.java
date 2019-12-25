@@ -1,6 +1,7 @@
 package ncu.soft.blog;
 
 import ncu.soft.blog.entity.Article;
+import ncu.soft.blog.entity.ArticleAndUserVo;
 import ncu.soft.blog.service.impl.ArticlesServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,7 +36,13 @@ public class BlogApplicationTests {
 
     @Test
     public void testGetPage(){
-        PageImpl<Article> articles = articlesService.getArticlesByPage(1, 5);
-        log.info("分页信息 【{}】", articles.getContent());
+        List<ArticleAndUserVo> articles = articlesService.getArticlesByPage(1, 5);
+        log.info("分页信息 【{}】", articles);
+    }
+
+    @Test
+    public void testGetArticle(){
+        ArticleAndUserVo article = articlesService.getArticle(50, "127.0.0.1");
+        log.info("文章信息 【{}】", article);
     }
 }

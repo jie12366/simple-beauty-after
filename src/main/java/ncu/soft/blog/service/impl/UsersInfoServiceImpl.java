@@ -41,6 +41,16 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     }
 
     @Override
+    public String findNameByUid(String uid) {
+        UsersInfo usersInfo = mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),UsersInfo.class);
+        if (usersInfo != null){
+            return usersInfo.getNickName();
+        }else {
+            return "";
+        }
+    }
+
+    @Override
     public UsersInfo save(UsersInfo usersInfo) {
         return mongoTemplate.insert(usersInfo);
     }

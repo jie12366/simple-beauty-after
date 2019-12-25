@@ -1,7 +1,12 @@
 package ncu.soft.blog.service.impl;
 
+import ncu.soft.blog.component.WebSocketServer;
+import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.Message;
+import ncu.soft.blog.entity.UsersInfo;
+import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.MessageService;
+import ncu.soft.blog.service.UsersInfoService;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +20,7 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,9 +34,66 @@ public class MessageServiceImpl implements MessageService {
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
+    @Resource
+    ArticlesServiceImpl articlesService;
+
+    @Resource
+    UsersInfoServiceImpl usersInfoService;
+
+    @Resource
+    WebSocketServer webSocketServer;
+
+    private final static String LIKE = "like";
+    private static final String COMMENT = "comment";
+
     @Override
     public Message save(Message message) {
         return mongoTemplate.insert(message);
+    }
+
+    @Override
+    public int likeArticle(int aid, String uid){
+        Article article = articlesService.getArticle(aid);
+        UsersInfo usersInfo = usersInfoService.findByUid(uid);
+        int likes;
+        // 判断该文章是否已被该用户点赞
+        if (getMessageByType(aid,uid,LIKE) != null){
+            // 向客户端推送消息，有人取消点赞了
+            webSocketServer.sendInfo("unLike",uid);
+            delete(aid,uid,LIKE);
+            likes = articlesService.updateLikes(aid,-1).getLikes();
+            usersInfoService.updateLikes(-1,uid);
+        }else {
+            // 向客户端推送消息，有人点赞了
+            webSocketServer.sendInfo("like",uid);
+            // 将点赞消息存入数据库
+            Message message1 = new Message(LIKE,aid,uid,"点赞了你的博文",
+                    article.getTitle(),usersInfo.getNickName(),new Date(),false);
+            save(message1);
+            // 更新文章喜欢量
+            likes = articlesService.updateLikes(aid,1).getLikes();
+            // 更新个人喜欢量
+            usersInfoService.updateLikes(1,uid);
+        }
+        return likes;
+    }
+
+    @Override
+    public void pushCommentMessage(int aid,String uid,String type){
+        Article article = articlesService.getArticle(aid);
+        UsersInfo usersInfo = usersInfoService.findByUid(String.valueOf(uid));
+        // 向客户端推送消息，有人评论了
+        webSocketServer.sendInfo("comment",String.valueOf(uid));
+        String message;
+        if (("reply").equals(type)){
+            message = "回复了你的评论";
+        }else {
+            message = "评论了你的博文";
+        }
+        // 将评论消息存入数据库
+        Message message1 = new Message(COMMENT,aid,uid,message,
+                article.getTitle(),usersInfo.getNickName(),new Date(),false);
+        save(message1);
     }
 
     @Override
@@ -62,11 +125,18 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Message changeMessageState(int id) {
+    public Boolean changeMessageState(int id, String uid) {
         Query query = new Query(Criteria.where("id").is(id));
         Update update = Update.update("hasRead",true);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
-        return mongoTemplate.findAndModify(query,update,options,Message.class);
+        Message message = mongoTemplate.findAndModify(query,update,options,Message.class);
+        if (message != null){
+            // 通知用户消息已读
+            webSocketServer.sendInfo("hasRead",uid);
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override

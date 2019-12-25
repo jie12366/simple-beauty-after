@@ -20,6 +20,21 @@ public interface MessageService {
     Message save(Message message);
 
     /**
+     * 用户对文章点赞
+     * @param aid 文章id
+     * @param uid 用户id
+     * @return 文章点赞数
+     */
+    int likeArticle(int aid, String uid);
+
+    /**
+     * 向客户端推送评论消息
+     * @param aid 文章id
+     * @param uid 用户id
+     */
+    void pushCommentMessage(int aid,String uid,String type);
+
+    /**
      * 删除信息
      * @param aid 文章id
      * @param uid 用户id
@@ -60,9 +75,10 @@ public interface MessageService {
     /**
      * 改变消息未读状态
      * @param id 消息id
-     * @return Message
+     * @param uid 用户id
+     * @return 是否成功
      */
-    Message changeMessageState(int id);
+    Boolean changeMessageState(int id, String uid);
 
     /**
      * 根据用户id获取信息

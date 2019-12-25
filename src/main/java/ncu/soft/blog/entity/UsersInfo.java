@@ -3,7 +3,7 @@ package ncu.soft.blog.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ncu.soft.blog.selfAnnotation.AutoIncKey;
+import ncu.soft.blog.selfannotation.AutoIncKey;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -35,6 +35,11 @@ public class UsersInfo implements Serializable {
      */
     @Indexed
     private String uid;
+
+    /**
+     * 用户自定义的主题
+     */
+    private UsersTheme usersTheme;
 
     /**
      * 我的昵称

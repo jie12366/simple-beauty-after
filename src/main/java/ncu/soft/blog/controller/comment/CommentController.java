@@ -1,23 +1,16 @@
 package ncu.soft.blog.controller.comment;
 
 import io.swagger.annotations.ApiOperation;
-import ncu.soft.blog.component.WebSocketServer;
-import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.Comment;
-import ncu.soft.blog.entity.Message;
-import ncu.soft.blog.entity.UsersInfo;
-import ncu.soft.blog.selfAnnotation.LoginToken;
-import ncu.soft.blog.service.ArticlesService;
-import ncu.soft.blog.service.CommentService;
-import ncu.soft.blog.service.MessageService;
-import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.selfannotation.LoginToken;
+import ncu.soft.blog.service.impl.CommentServiceImpl;
+import ncu.soft.blog.service.impl.MessageServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,21 +22,10 @@ import java.util.List;
 public class CommentController {
 
     @Resource
-    CommentService commentService;
+    CommentServiceImpl commentService;
 
     @Resource
-    ArticlesService articlesService;
-
-    @Resource
-    UsersInfoService usersInfoService;
-
-    @Resource
-    MessageService messageService;
-
-    @Resource
-    WebSocketServer webSocketServer;
-
-    private static final String COMMENT = "comment";
+    MessageServiceImpl messageService;
 
     @ApiOperation("将评论存入")
     @PostMapping("/comments")
@@ -52,7 +34,7 @@ public class CommentController {
                                    @RequestParam("toUid") String toUid,@RequestParam("content") String content){
         Comment comment = new Comment(aid,uid,content);
         if (commentService.save(comment) != null){
-            pushCommentMessage(aid,toUid,"comment");
+            messageService.pushCommentMessage(aid,toUid,"comment");
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -66,7 +48,7 @@ public class CommentController {
                                 @RequestParam("content")String content,@RequestParam("rContent")String rContent){
         Comment comment = new Comment(aid,uid,rUid,content,rContent);
         if (commentService.saveReply(comment) != null){
-            pushCommentMessage(aid,rUid,"reply");
+            messageService.pushCommentMessage(aid,rUid,"reply");
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -83,27 +65,4 @@ public class CommentController {
             return JsonResult.success(comments);
         }
     }
-
-    /**
-     * 向客户端推送评论消息
-     * @param aid 文章id
-     * @param uid 用户id
-     */
-    private void pushCommentMessage(int aid,String uid,String type){
-        Article article = articlesService.getArticle(aid);
-        UsersInfo usersInfo = usersInfoService.findByUid(String.valueOf(uid));
-        // 向客户端推送消息，有人评论了
-        webSocketServer.sendInfo("comment",String.valueOf(uid));
-        String message = "";
-        if (("reply").equals(type)){
-            message = "回复了你的评论";
-        }else {
-            message = "评论了你的博文";
-        }
-        // 将评论消息存入数据库
-        Message message1 = new Message(COMMENT,aid,uid,message,
-                article.getTitle(),usersInfo.getNickName(),new Date(),false);
-        messageService.save(message1);
-    }
-
 }

@@ -36,6 +36,30 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <!--邮件发送的依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!--支持redis的依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!--websocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!--AOP切面编程-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!--lombok支持的依赖-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -47,42 +71,6 @@
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>
             <version>7.2.26</version>
-        </dependency>
-
-        <!--邮件发送的依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <!--支持redis的依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>2.1.3.RELEASE</version>
-        </dependency>
-        <!-- redis 客户端使用jedis -->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-        </dependency>
-        <!-- spring2.X集成redis所需common-pool2，使用jedis必须依赖它-->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.5.0</version>
-        </dependency>
-
-        <!--AOP切面编程-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.2</version>
         </dependency>
 
         <!--json处理工具-->
@@ -100,7 +88,7 @@
             <version>2.6.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui -->
+        <!-- swagger2的UI(第三方的) -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>swagger-bootstrap-ui</artifactId>
@@ -140,12 +128,6 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>4.6.3</version>
-        </dependency>
-
-        <!--websocket-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <!--Google的集合框架-->

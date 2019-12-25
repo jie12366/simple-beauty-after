@@ -50,6 +50,14 @@ public interface ArticlesService {
     Article getArticle(int aid);
 
     /**
+     * 根据aid获取文章数据
+     * @param aid 文章id
+     * @param ip 访问ip
+     * @return Article
+     */
+    Article getArticle(int aid, String ip);
+
+    /**
      * 阅读量+1
      * @param aid 文章id
      * @param num 数量

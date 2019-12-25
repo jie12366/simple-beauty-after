@@ -1,4 +1,4 @@
-package ncu.soft.blog.selfAnnotation;
+package ncu.soft.blog.selfannotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
 /**
  * @author www.xyjz123.xyz
- * @description
+ * @description mongodb连接配置
  * @date 2019/8/27 8:49
  */
 @Configuration

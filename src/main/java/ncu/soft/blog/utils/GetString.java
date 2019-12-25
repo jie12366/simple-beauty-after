@@ -43,7 +43,6 @@ public class GetString {
     }
 
     public static String getCode() {
-        String code = (int) ((Math.random() * 9 + 1) * 100000) + "";
-        return code;
+        return (int) ((Math.random() * 9 + 1) * 100000) + "";
     }
 }

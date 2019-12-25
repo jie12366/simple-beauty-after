@@ -2,7 +2,7 @@ package ncu.soft.blog.controller.user;
 
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.UsersInfo;
-import ncu.soft.blog.selfAnnotation.LoginToken;
+import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.service.EmailService;
 import ncu.soft.blog.service.UploadService;
 import ncu.soft.blog.service.UsersInfoService;

@@ -1,32 +1,24 @@
 package ncu.soft.blog.controller.article;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
-import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.DetailService;
 import ncu.soft.blog.service.TagService;
-import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.service.impl.ArticlesServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author www.xyjz123.xyz
@@ -37,23 +29,13 @@ import java.util.concurrent.TimeUnit;
 public class ShowController {
 
     @Resource
-    ArticlesService articlesService;
+    ArticlesServiceImpl articlesService;
 
     @Resource
     DetailService detailService;
 
     @Resource
     TagService tagService;
-
-    @Resource
-    UsersInfoService usersInfoService;
-
-    @Resource
-    SetOperations<String,String> setOperations;
-
-    private ThreadPoolExecutor executor = new ThreadPoolExecutor(10,10,
-            0L,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<>(255),
-            new ThreadFactoryBuilder().setNameFormat("res-%d").build());
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
@@ -85,33 +67,11 @@ public class ShowController {
 
     @ApiOperation("获取文章数据")
     @GetMapping("/article/{aid}")
-    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) throws UnknownHostException {
+    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) {
         // 获取访问者真实ip
-        String ip = getIp(request);
-
-        Article article = articlesService.getArticle(aid);
+        String ip = articlesService.getIp(request);
+        Article article = articlesService.getArticle(aid, ip);
         if (article != null){
-            // 如果键存在
-            if (setOperations.getOperations().hasKey(String.valueOf(aid))){
-                // 如果该键不存在该元素
-                if (!setOperations.isMember(String.valueOf(aid),ip)){
-                    // 将点赞这篇文章的uid放进集合中
-                    setOperations.add(String.valueOf(aid),ip);
-                    // 更新文章阅读量，+1
-                    articlesService.updateReads(aid,1);
-                    // 更新个人访问，+1
-                    usersInfoService.updateReads(1,String.valueOf(article.getUid()));
-                }
-            }else {
-                // 将点赞这篇文章的uid放进集合中
-                setOperations.add(String.valueOf(aid),ip);
-                // 将key持久化
-                setOperations.getOperations().persist(String.valueOf(aid));
-                // 更新文章阅读量，+1
-                articlesService.updateReads(aid,1);
-                // 更新个人访问，+1
-                usersInfoService.updateReads(1,String.valueOf(article.getUid()));
-            }
             return JsonResult.success(article);
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -186,19 +146,10 @@ public class ShowController {
         }else {
             List<JSONObject> result = new ArrayList<>();
             for (Article article : articles.getContent()){
-                // 使用多线程加快处理速度
-                executor.execute(() ->{
-                    JSONObject json = new JSONObject();
-                    // 取出标题返回给前端
-                    json.put("value",article.getTitle());
-                    result.add(json);
-                });
-            }
-            // 等待多线程所有任务运行结束
-            while (result.size() == articles.getContent().size()){
-                if (executor.isTerminated()){
-                    break;
-                }
+                JSONObject json = new JSONObject();
+                // 取出标题返回给前端
+                json.put("value",article.getTitle());
+                result.add(json);
             }
             return JsonResult.success(result);
         }
@@ -226,33 +177,5 @@ public class ShowController {
         }else {
             return JsonResult.success(articles);
         }
-    }
-
-    private final static String UNKNOWN = "unknown";
-
-    /**
-     * 获取访问用户的真实ip
-     * @param request HttpServletRequest
-     * @return 获取到的ip地址
-     */
-    private String getIp(HttpServletRequest request){
-        String ip = request.getHeader("x-forwarded-for");
-        // 获取用户的真实ip地址（避免用户使用了多级代理而取不到真实ip）
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 }

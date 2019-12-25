@@ -1,14 +1,14 @@
 package ncu.soft.blog.controller.article;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.component.WebSocketServer;
-import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.Message;
-import ncu.soft.blog.entity.UsersInfo;
-import ncu.soft.blog.selfAnnotation.LoginToken;
+import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.MessageService;
-import ncu.soft.blog.service.UsersInfoService;
+import ncu.soft.blog.service.impl.ArticlesServiceImpl;
+import ncu.soft.blog.service.impl.MessageServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Date;
 
 /**
  * @author www.xyjz123.xyz
@@ -27,16 +26,10 @@ import java.util.Date;
 public class ManageController {
 
     @Resource
-    ArticlesService articlesService;
+    ArticlesServiceImpl articlesService;
 
     @Resource
-    UsersInfoService usersInfoService;
-
-    @Resource
-    MessageService messageService;
-
-    @Resource
-    WebSocketServer webSocketServer;
+    MessageServiceImpl messageService;
 
     private final static String LIKE = "like";
 
@@ -52,28 +45,7 @@ public class ManageController {
     @PostMapping("/article/like/{aid}/{uid}")
     @LoginToken
     public JsonResult likeArticle(@Valid @PathVariable("aid") int aid,@PathVariable("uid") String uid){
-        Article article = articlesService.getArticle(aid);
-        UsersInfo usersInfo = usersInfoService.findByUid(uid);
-        int likes = 0;
-        // 判断该文章是否已被该用户点赞
-        if (messageService.getMessageByType(aid,uid,LIKE) != null){
-            // 向客户端推送消息，有人取消点赞了
-            webSocketServer.sendInfo("unLike",uid);
-            messageService.delete(aid,uid,LIKE);
-            likes = articlesService.updateLikes(aid,-1).getLikes();
-            usersInfoService.updateLikes(-1,uid);
-        }else {
-            // 向客户端推送消息，有人点赞了
-            webSocketServer.sendInfo("like",uid);
-            // 将点赞消息存入数据库
-            Message message1 = new Message(LIKE,aid,uid,"点赞了你的博文",
-                    article.getTitle(),usersInfo.getNickName(),new Date(),false);
-            messageService.save(message1);
-            // 更新文章喜欢量
-            likes = articlesService.updateLikes(aid,1).getLikes();
-            // 更新个人喜欢量
-            usersInfoService.updateLikes(1,uid);
-        }
+        int likes = messageService.likeArticle(aid, uid);
         return JsonResult.success(likes);
     }
 
@@ -113,9 +85,8 @@ public class ManageController {
     @ApiOperation("改变消息未读为已读")
     @PutMapping("/message/{id}/{uid}")
     public JsonResult changeState(@Valid @PathVariable("id") int id,@PathVariable("uid") String uid){
-        Message message = messageService.changeMessageState(id);
-        webSocketServer.sendInfo("hasRead",uid);
-        if (message != null){
+        Boolean message = messageService.changeMessageState(id, uid);
+        if (message){
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.UPDATE_ERROR);

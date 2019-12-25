@@ -1,7 +1,7 @@
 package ncu.soft.blog.controller.common;
 
 import io.swagger.annotations.ApiOperation;
-import ncu.soft.blog.selfAnnotation.LoginToken;
+import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.utils.JsonResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

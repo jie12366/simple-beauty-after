@@ -1,6 +1,5 @@
 package ncu.soft.blog.component;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +9,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -42,13 +41,6 @@ public class WebSocketServer {
      * 用户id
      */
     private String uid;
-
-    /**
-     * 构造一个固定线程的线程池
-     */
-    private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(10, 10,
-            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(200),
-            new ThreadFactoryBuilder().setNameFormat("monJay-%d").build());
 
     @OnOpen
     public void onOpen(Session session,@PathParam("uid") String uid){
@@ -99,11 +91,9 @@ public class WebSocketServer {
         log.info("推送消息到窗口"+uid+"，推送内容:"+message);
         // 遍历webSocketSet集合
         for (WebSocketServer item : webSocketSet) {
-            poolExecutor.submit(() -> {
-                if(item.uid.equals(uid)){
-                    item.sendMessage(message);
-                }
-            });
+            if(item.uid.equals(uid)){
+                item.sendMessage(message);
+            }
         }
     }
 

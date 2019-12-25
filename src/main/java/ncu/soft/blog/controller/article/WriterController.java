@@ -5,8 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
 import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
-import ncu.soft.blog.selfAnnotation.LoginToken;
+import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.service.*;
+import ncu.soft.blog.service.impl.ArticlesServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class WriterController {
     TagService tagService;
 
     @Resource
-    ArticlesService articlesService;
+    ArticlesServiceImpl articlesService;
 
     @Resource
     DetailService detailService;
@@ -69,29 +70,22 @@ public class WriterController {
         Article article = new Article(uid,category,tagList,title,pwd);
         // 保存文章信息并返回
         Article article1 = articlesService.save(article,contentHtml,aid);
-
         if(aid == 0) {
             //文章数加1
             usersInfoService.updateArticles(1,uid);
         }
-
         if (article1 == null){
             // 保存数据错误
             return JsonResult.failure(ResultCode.SAVE_ERROR);
         }
+        ArticleDetail articleDetail = new ArticleDetail(article1.getId(), contentMd, contentHtml);
 
-        ArticleDetail articleDetail = new ArticleDetail();
-        articleDetail.setAid(article1.getId());
-        articleDetail.setContentMd(contentMd);
-        articleDetail.setContentHtml(contentHtml);
-
-        ArticleDetail articleDetail1 = null;
+        ArticleDetail articleDetail1;
         if (aid > 0){
             articleDetail1 = detailService.update(articleDetail);
         }else {
             articleDetail1 = detailService.save(articleDetail);
         }
-
         //保存文章详情内容
         if (articleDetail1 != null){
             return JsonResult.success();

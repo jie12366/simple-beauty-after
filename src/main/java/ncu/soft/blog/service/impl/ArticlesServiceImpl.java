@@ -8,9 +8,6 @@ import ncu.soft.blog.utils.RemoveHtmlTags;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,16 +17,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * @author www.xyjz123.xyz
@@ -43,16 +41,19 @@ public class ArticlesServiceImpl implements ArticlesService {
     MongoTemplate mongoTemplate;
 
     @Resource
-    UsersInfoService usersInfoService;
+    UsersInfoServiceImpl usersInfoService;
 
     @Resource
-    CommentService commentService;
+    CommentServiceImpl commentService;
 
     @Resource
-    DetailService detailService;
+    DetailServiceImpl detailService;
 
     @Resource
-    TagService tagService;
+    TagServiceImpl tagService;
+
+    @Resource
+    SetOperations<String,String> setOperations;
 
     @Override
     public Article save(Article article,String contentHtml,int aid) {
@@ -113,7 +114,9 @@ public class ArticlesServiceImpl implements ArticlesService {
     @Override
     public PageImpl<Article> getArticlesByPage(int pageIndex, int pageSize) {
         Query query = new Query().with(new Sort(Sort.Direction.DESC,"aTime"));
-        return getArticles(pageIndex,pageSize,query);
+        // 获取分页信息
+        PageImpl<Article> articles = getArticles(pageIndex,pageSize,query);
+        return setUserNickName(articles);
     }
 
     @Override
@@ -125,6 +128,43 @@ public class ArticlesServiceImpl implements ArticlesService {
     @Override
     public Article getArticle(int aid) {
         return mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
+    }
+
+    @Override
+    public Article getArticle(int aid, String ip) {
+        Article article = mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
+        if (article != null) {
+            // 设置文章内容
+            article.setArticleDetail(detailService.getArticleByAid(article.getId()));
+            // 设置用户信息
+            article.setUsersInfo(usersInfoService.findByUid(article.getUid()));
+            // 如果文章被阅读过
+            if (setOperations.getOperations().hasKey(String.valueOf(aid))) {
+                // 如果该键不存在该元素
+                if (!setOperations.isMember(String.valueOf(aid), ip)) {
+                    // 将阅读这篇文章的uid放进集合中
+                    setOperations.add(String.valueOf(aid), ip);
+                    // 更新文章阅读量，+1
+                    updateReads(aid, 1);
+                    article.setReads(article.getReads() + 1);
+                    // 更新个人访问，+1
+                    usersInfoService.updateReads(1, String.valueOf(article.getUid()));
+                }
+            } else {
+                // 将阅读这篇文章的uid放进集合中
+                setOperations.add(String.valueOf(aid), ip);
+                // 将key持久化
+                setOperations.getOperations().persist(String.valueOf(aid));
+                // 更新文章阅读量，+1
+                updateReads(aid, 1);
+                article.setReads(article.getReads() + 1);
+                // 更新个人访问，+1
+                usersInfoService.updateReads(1, String.valueOf(article.getUid()));
+            }
+            return article;
+        }else {
+            return null;
+        }
     }
 
     @Override
@@ -177,7 +217,8 @@ public class ArticlesServiceImpl implements ArticlesService {
     @Override
     public PageImpl<Article> getArticleByRegex(int index, int size, String regex) {
         Query query = new Query(Criteria.where("title").regex(".*?" + regex + ".*"));
-        return getArticles(index,size,query);
+        PageImpl<Article> articles = getArticles(index,size,query);
+        return setUserNickName(articles);
     }
 
     @Override
@@ -299,10 +340,12 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param aid 文章id
      */
     private void removeMyTag(int aid){
-        Article article = getArticle(aid);
-        MyTag myTag = tagService.findByUid(article.getUid());
-        String archive = DateUtil.format(article.getArticleTime(),"yyyy-MM");
-        removeTag(myTag,article.getTags(),article.getCategory(),archive);
+        Article article = mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
+        if (article != null){
+            MyTag myTag = tagService.findByUid(article.getUid());
+            String archive = DateUtil.format(article.getArticleTime(),"yyyy-MM");
+            removeTag(myTag,article.getTags(),article.getCategory(),archive);
+        }
     }
 
     /**
@@ -333,5 +376,46 @@ public class ArticlesServiceImpl implements ArticlesService {
         }else { // 如果不存在就put进去
             maps.put(key,1);
         }
+    }
+
+    private final static String UNKNOWN = "unknown";
+
+    /**
+     * 获取访问用户的真实ip
+     * @param request HttpServletRequest
+     * @return 获取到的ip地址
+     */
+    public String getIp(HttpServletRequest request){
+        String ip = request.getHeader("x-forwarded-for");
+        // 获取用户的真实ip地址（避免用户使用了多级代理而取不到真实ip）
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    /**
+     * 遍历文章数据，设置文章对应的作者
+     * @param articles 文章分页数据
+     * @return 设置作者后的数据
+     */
+    private PageImpl<Article> setUserNickName(PageImpl<Article> articles){
+        for (Article article : articles.getContent()){
+            // 设置用户昵称
+            article.setUsersInfo(usersInfoService.findByUid(article.getUid()));
+        }
+        return articles;
     }
 }

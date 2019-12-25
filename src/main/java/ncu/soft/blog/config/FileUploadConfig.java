@@ -5,7 +5,6 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
 import ncu.soft.blog.utils.QiniuUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -62,10 +61,10 @@ public class FileUploadConfig {
     }
 
     /**
-     * 华东   Zone.zone0()
-     * 华北   Zone.zone1()
-     * 华南   Zone.zone2()
-     * 北美   Zone.zoneNa0()
+     * 华东   Region.region0()
+     * 华北   Region.region1()
+     * 华南   Region.region2()
+     * 北美   Region.region3()
      */
     @Bean
     public com.qiniu.storage.Configuration qiniuConfig() {
@@ -83,8 +82,7 @@ public class FileUploadConfig {
 
     /**
      * 认证信息实例
-     *
-     * @return
+     * @return Auth
      */
     @Bean
     public Auth auth() {

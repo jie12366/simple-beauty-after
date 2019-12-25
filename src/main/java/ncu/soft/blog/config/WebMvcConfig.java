@@ -29,8 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/statics/**").addResourceLocations("classpath:/statics/");
-        // 解决 SWAGGER 404报错
+        // 将swagger生成的信息加入到资源处理器中
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }

@@ -1,9 +1,7 @@
 package ncu.soft.blog.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import ncu.soft.blog.entity.Article;
-import ncu.soft.blog.entity.ArticleAndUserVo;
-import ncu.soft.blog.entity.MyTag;
+import ncu.soft.blog.entity.*;
 import ncu.soft.blog.service.*;
 import ncu.soft.blog.utils.RemoveHtmlTags;
 import org.jsoup.Jsoup;
@@ -135,10 +133,12 @@ public class ArticlesServiceImpl implements ArticlesService {
         if (article != null) {
             // 设置文章
             articleAndUserVo.setArticle(article);
+            ArticleDetail articleDetail = detailService.getArticleByAid(article.getId());
             // 设置文章详情
-            articleAndUserVo.setArticleDetail(detailService.getArticleByAid(article.getId()));
+            articleAndUserVo.setArticleDetail(articleDetail);
+            UsersInfo usersInfo = usersInfoService.findByUid(article.getUid());
             // 设置用户信息
-            articleAndUserVo.setUsersInfo(usersInfoService.findByUid(article.getUid()));
+            articleAndUserVo.setUsersInfo(usersInfo);
             // 如果文章被阅读过
             if (setOperations.getOperations().hasKey(String.valueOf(aid))) {
                 // 如果该键不存在该元素
@@ -414,14 +414,16 @@ public class ArticlesServiceImpl implements ArticlesService {
      */
     private List<ArticleAndUserVo> setUserNickName(PageImpl<Article> articles){
         List<ArticleAndUserVo> articleAndUserVos = new ArrayList<>();
+        Integer total = articles.getTotalPages();
         for (Article article : articles.getContent()){
             ArticleAndUserVo articleAndUserVo = new ArticleAndUserVo();
             // 设置总页数
-            articleAndUserVo.setTotal(articles.getTotalPages());
+            articleAndUserVo.setTotal(total);
             // 设置文章
             articleAndUserVo.setArticle(article);
+            String nickname = usersInfoService.findNameByUid(article.getUid());
             // 设置用户昵称
-            articleAndUserVo.setNickName(usersInfoService.findNameByUid(article.getUid()));
+            articleAndUserVo.setNickName(nickname);
             articleAndUserVos.add(articleAndUserVo);
         }
         return articleAndUserVos;

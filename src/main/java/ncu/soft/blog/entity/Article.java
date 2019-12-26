@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ncu.soft.blog.selfannotation.AutoIncKey;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -36,6 +37,18 @@ public class Article implements Serializable {
      * 用户uid
      */
     private String uid;
+
+    /**
+     * 用户信息
+     */
+    @DBRef
+    private UsersInfo usersInfo;
+
+    /**
+     * 文章详情
+     */
+    @DBRef
+    private ArticleDetail articleDetail;
 
     /**
      * 文章个人分类

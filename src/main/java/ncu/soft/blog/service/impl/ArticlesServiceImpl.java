@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -108,11 +111,22 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public List<ArticleAndUserVo> getArticlesByPage(int pageIndex, int pageSize) {
-        Query query = new Query().with(new Sort(Sort.Direction.DESC,"aTime"));
+    public PageImpl<Article> getArticlesByPage(int pageIndex, int pageSize) {
+        // 设置分页信息
+        Pageable pageable = PageRequest.of(pageIndex,pageSize);
+        Query query = new Query().with(pageable);
+        // 计算总数
+        long count = mongoTemplate.count(query,Article.class);
+        // 聚合操作，多表查询
+        TypedAggregation<Article> aggregation = Aggregation.newAggregation(Article.class,
+                // 左连接用户信息表
+                Aggregation.lookup("users_info", "uid", "uid", "usersInfo"),
+                // 按时间降序排序
+                Aggregation.sort(Sort.Direction.DESC, "articleTime"));
+        // 获取聚合结果
+        List<Article> articles = mongoTemplate.aggregate(aggregation, Article.class).getMappedResults();
         // 获取分页信息
-        PageImpl<Article> articles = getArticles(pageIndex,pageSize,query);
-        return setUserNickName(articles);
+        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> count);
     }
 
     @Override
@@ -127,18 +141,18 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public ArticleAndUserVo getArticle(int aid, String ip) {
-        Article article = mongoTemplate.findOne(new Query(Criteria.where("id").is(aid)),Article.class);
-        ArticleAndUserVo articleAndUserVo = new ArticleAndUserVo();
+    public Article getArticle(int aid, String ip) {
+        TypedAggregation<Article> aggregation = Aggregation.newAggregation(Article.class,
+                // 左连接用户表
+                Aggregation.lookup("users_info", "uid", "uid", "usersInfo"),
+                // 左连接文章详情表
+                Aggregation.lookup("article_detail", "_id", "aid", "articleDetail"),
+                // 过滤
+                Aggregation.match(Criteria.where("id").is(aid))
+        );
+        // 获取结果集的第一个值
+        Article article = mongoTemplate.aggregate(aggregation, Article.class).getMappedResults().get(0);
         if (article != null) {
-            // 设置文章
-            articleAndUserVo.setArticle(article);
-            ArticleDetail articleDetail = detailService.getArticleByAid(article.getId());
-            // 设置文章详情
-            articleAndUserVo.setArticleDetail(articleDetail);
-            UsersInfo usersInfo = usersInfoService.findByUid(article.getUid());
-            // 设置用户信息
-            articleAndUserVo.setUsersInfo(usersInfo);
             // 如果文章被阅读过
             if (setOperations.getOperations().hasKey(String.valueOf(aid))) {
                 // 如果该键不存在该元素
@@ -162,7 +176,7 @@ public class ArticlesServiceImpl implements ArticlesService {
                 // 更新个人访问，+1
                 usersInfoService.updateReads(1, String.valueOf(article.getUid()));
             }
-            return articleAndUserVo;
+            return article;
         }else {
             return null;
         }
@@ -216,10 +230,24 @@ public class ArticlesServiceImpl implements ArticlesService {
     }
 
     @Override
-    public List<ArticleAndUserVo> getArticleByRegex(int index, int size, String regex) {
-        Query query = new Query(Criteria.where("title").regex(".*?" + regex + ".*"));
-        PageImpl<Article> articles = getArticles(index,size,query);
-        return setUserNickName(articles);
+    public PageImpl<Article> getArticleByRegex(int index, int size, String regex) {
+        // 设置分页信息
+        Pageable pageable = PageRequest.of(index,size);
+        Query query = new Query().with(pageable);
+        // 计算总数
+        long count = mongoTemplate.count(query,Article.class);
+        // 聚合操作，多表查询
+        TypedAggregation<Article> aggregation = Aggregation.newAggregation(Article.class,
+                // 左连接用户信息表
+                Aggregation.lookup("users_info", "uid", "uid", "usersInfo"),
+                // 按时间降序排序
+                Aggregation.sort(Sort.Direction.DESC, "articleTime"),
+                // 按正则表达式过滤
+                Aggregation.match(Criteria.where("title").regex(".*?" + regex + ".*")));
+        // 获取聚合结果
+        List<Article> articles = mongoTemplate.aggregate(aggregation, Article.class).getMappedResults();
+        // 获取分页信息
+        return (PageImpl<Article>) PageableExecutionUtils.getPage(articles,pageable,() -> count);
     }
 
     @Override
@@ -412,20 +440,11 @@ public class ArticlesServiceImpl implements ArticlesService {
      * @param articles 文章分页数据
      * @return 设置作者后的数据
      */
-    private List<ArticleAndUserVo> setUserNickName(PageImpl<Article> articles){
-        List<ArticleAndUserVo> articleAndUserVos = new ArrayList<>();
+    private PageImpl<Article> setUserNickName(PageImpl<Article> articles){
         Integer total = articles.getTotalPages();
         for (Article article : articles.getContent()){
-            ArticleAndUserVo articleAndUserVo = new ArticleAndUserVo();
-            // 设置总页数
-            articleAndUserVo.setTotal(total);
-            // 设置文章
-            articleAndUserVo.setArticle(article);
-            String nickname = usersInfoService.findNameByUid(article.getUid());
-            // 设置用户昵称
-            articleAndUserVo.setNickName(nickname);
-            articleAndUserVos.add(articleAndUserVo);
+
         }
-        return articleAndUserVos;
+        return articles;
     }
 }

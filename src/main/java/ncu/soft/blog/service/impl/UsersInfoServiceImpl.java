@@ -25,19 +25,9 @@ public class UsersInfoServiceImpl implements UsersInfoService {
     @Resource(name = "mongoTemplate")
     MongoTemplate mongoTemplate;
 
-    @Resource
-    UsersThemeServiceImpl usersThemeService;
-
     @Override
     public UsersInfo findByUid(String uid) {
-        UsersInfo usersInfo = mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),UsersInfo.class);
-        if (usersInfo != null){
-            // 获取该用户的主题，并赋值到用户信息中
-            usersInfo.setUsersTheme(usersThemeService.getTheme(uid));
-            return usersInfo;
-        }else {
-            return null;
-        }
+        return mongoTemplate.findOne(new Query(Criteria.where("uid").is(uid)),UsersInfo.class);
     }
 
     @Override

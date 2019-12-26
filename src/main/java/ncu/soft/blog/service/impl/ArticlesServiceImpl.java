@@ -122,7 +122,9 @@ public class ArticlesServiceImpl implements ArticlesService {
                 // 左连接用户信息表
                 Aggregation.lookup("users_info", "uid", "uid", "usersInfo"),
                 // 按时间降序排序
-                Aggregation.sort(Sort.Direction.DESC, "articleTime"));
+                Aggregation.sort(Sort.Direction.DESC, "articleTime"),
+                Aggregation.skip((long)pageIndex),
+                Aggregation.limit(pageSize));
         // 获取聚合结果
         List<Article> articles = mongoTemplate.aggregate(aggregation, Article.class).getMappedResults();
         // 获取分页信息
@@ -243,7 +245,9 @@ public class ArticlesServiceImpl implements ArticlesService {
                 // 按时间降序排序
                 Aggregation.sort(Sort.Direction.DESC, "articleTime"),
                 // 按正则表达式过滤
-                Aggregation.match(Criteria.where("title").regex(".*?" + regex + ".*")));
+                Aggregation.match(Criteria.where("title").regex(".*?" + regex + ".*")),
+                Aggregation.skip((long)index),
+                Aggregation.limit(size));
         // 获取聚合结果
         List<Article> articles = mongoTemplate.aggregate(aggregation, Article.class).getMappedResults();
         // 获取分页信息

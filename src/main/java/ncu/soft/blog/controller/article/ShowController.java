@@ -54,19 +54,8 @@ public class ShowController {
         }
     }
 
-    @ApiOperation("获取文章内容")
-    @GetMapping("/articleDetail/{aid}")
-    public JsonResult getArticlesByAid(@Valid @PathVariable("aid")int aid){
-        ArticleDetail articleDetail = detailService.getArticleByAid(aid);
-        if (articleDetail != null){
-            return JsonResult.success(articleDetail);
-        }else {
-            return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
-        }
-    }
-
     @ApiOperation("获取文章数据")
-    @GetMapping("/article/{aid}")
+    @GetMapping("/articles/{aid}")
     public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) {
         // 获取访问者真实ip
         String ip = articlesService.getIp(request);

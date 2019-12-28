@@ -8,6 +8,7 @@ import ncu.soft.blog.entity.MyTag;
 import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.service.*;
 import ncu.soft.blog.service.impl.ArticlesServiceImpl;
+import ncu.soft.blog.service.impl.DetailServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class WriterController {
     ArticlesServiceImpl articlesService;
 
     @Resource
-    DetailService detailService;
+    DetailServiceImpl detailService;
 
     @ApiOperation("将编辑器中选择的图片上传到服务器")
     @PostMapping("/image")
@@ -78,7 +79,7 @@ public class WriterController {
             // 保存数据错误
             return JsonResult.failure(ResultCode.SAVE_ERROR);
         }
-        ArticleDetail articleDetail = new ArticleDetail(article1.getId(), contentMd, contentHtml);
+        ArticleDetail articleDetail = new ArticleDetail(article1.getId(), contentHtml, contentMd);
 
         ArticleDetail articleDetail1;
         if (aid > 0){

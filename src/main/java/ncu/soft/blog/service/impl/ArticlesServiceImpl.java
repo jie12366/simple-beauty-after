@@ -91,8 +91,7 @@ public class ArticlesServiceImpl implements ArticlesService {
             removeMyTag(aid);
 
             Update update = Update.update("category",article.getCategory()).set("tags",article.getTags())
-                    .set("cPath",coverPath).set("title",article.getTitle()).set("summary",summary)
-                    .set("aTime",date).set("pwd",article.getPwd());
+                    .set("cPath",coverPath).set("title",article.getTitle()).set("summary",summary).set("pwd",article.getPwd());
             FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
             return mongoTemplate.findAndModify(new Query(Criteria.where("id").is(aid)),update,options,Article.class);
         }

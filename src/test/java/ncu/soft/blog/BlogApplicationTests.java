@@ -33,13 +33,7 @@ public class BlogApplicationTests {
 
     @Test
     public void testGetPage(){
-        PageImpl<Article> articles = articlesService.getArticlesByPage(0, 5);
-        log.info("分页信息 【{}】", articles.getContent());
-    }
-
-    @Test
-    public void testRegex(){
-        PageImpl<Article> articles = articlesService.getArticleByRegex(0, 5, "AOP");
+        PageImpl<Article> articles = articlesService.getArticlesByPage(80, 10);
         log.info("分页信息 【{}】", articles.getContent());
     }
 }

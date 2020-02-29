@@ -76,6 +76,7 @@ public class OauthController {
         JSONObject jsonObject = JSONObject.parseObject(result);
         // 获取json对象中的data对象
         JSONObject data = jsonObject.getJSONObject("data");
+        log.info("data: [{}]", data);
         String uid = data.getString("uuid");
         UsersInfo usersInfo1 = usersInfoService.findByUid(uid);
         // 如果用户不存在，则将获取的第三方应用的信息存入(唯一标识uid,昵称,头像)

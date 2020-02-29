@@ -35,10 +35,10 @@ public class MessageServiceImpl implements MessageService {
     MongoTemplate mongoTemplate;
 
     @Resource
-    ArticlesServiceImpl articlesService;
+    ArticlesService articlesService;
 
     @Resource
-    UsersInfoServiceImpl usersInfoService;
+    UsersInfoService usersInfoService;
 
     @Resource
     WebSocketServer webSocketServer;
@@ -79,11 +79,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void pushCommentMessage(int aid,String uid,String type){
+    public void pushCommentMessage(int aid,String uid, String toUid,String type){
         Article article = articlesService.getArticle(aid);
         UsersInfo usersInfo = usersInfoService.findByUid(String.valueOf(uid));
         // 向客户端推送消息，有人评论了
-        webSocketServer.sendInfo("comment",String.valueOf(uid));
+        webSocketServer.sendInfo("comment",String.valueOf(toUid));
         String message;
         if (("reply").equals(type)){
             message = "回复了你的评论";

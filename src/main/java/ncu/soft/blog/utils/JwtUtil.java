@@ -18,7 +18,7 @@ public class JwtUtil {
      * @return 生成的token字符串
      */
     public static String generateToken(Users users){
-        //MD5加密的密码和当前时间戳作为数字签证
+        // MD5加密的密码和当前时间戳作为数字签证
         String secret = GetString.getMd5(users.getUPwd()) + System.currentTimeMillis();
         return JWT.create()
                 .withAudience(String.valueOf(users.getId()))

@@ -30,9 +30,11 @@ public interface MessageService {
     /**
      * 向客户端推送评论消息
      * @param aid 文章id
-     * @param uid 用户id
+     * @param uid 评论者用户id
+     * @param toUid 被评论者ID
+     * @param type 评论类型
      */
-    void pushCommentMessage(int aid,String uid,String type);
+    void pushCommentMessage(int aid, String uid, String toUid, String type);
 
     /**
      * 删除信息

@@ -25,7 +25,7 @@ public class RedisConfig {
     /**
      * 如使用缓存注解的话需要配置cacheManager
      * @param connectionFactory redis连接工厂
-     * @return 缓存管理器
+     * @return 底层使用Redis作为缓存管理器
      */
     @Bean
     CacheManager cacheManager(RedisConnectionFactory connectionFactory) {

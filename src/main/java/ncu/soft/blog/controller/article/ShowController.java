@@ -3,9 +3,7 @@ package ncu.soft.blog.controller.article;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Article;
-import ncu.soft.blog.entity.ArticleDetail;
 import ncu.soft.blog.entity.MyTag;
-import ncu.soft.blog.service.DetailService;
 import ncu.soft.blog.service.TagService;
 import ncu.soft.blog.service.impl.ArticlesServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
@@ -32,20 +30,17 @@ public class ShowController {
     ArticlesServiceImpl articlesService;
 
     @Resource
-    DetailService detailService;
-
-    @Resource
     TagService tagService;
 
     @ApiOperation("首页分页展示文章列表")
     @GetMapping("/articles/{index}/{size}")
-    public JsonResult getArticles(@Valid @PathVariable("index")int index,@PathVariable("size") int size){
+    public JsonResult getArticles(@PathVariable("index")int index,@PathVariable("size") int size){
         return JsonResult.success(articlesService.getArticlesByPage(index, size));
     }
 
     @ApiOperation("我的主页分页展示我的文章")
     @GetMapping("/articles/{uid}/{index}/{size}")
-    public JsonResult getArticlesByUid(@Valid @PathVariable("uid")String uid, @PathVariable("index")int index,@PathVariable("size") int size){
+    public JsonResult getArticlesByUid(@PathVariable("uid")String uid, @PathVariable("index")int index,@PathVariable("size") int size){
         PageImpl<Article> articles = articlesService.getArticlesByUidByPage(index,size,uid);
         if (!articles.isEmpty()){
             return JsonResult.success(articles);
@@ -56,7 +51,7 @@ public class ShowController {
 
     @ApiOperation("获取文章数据")
     @GetMapping("/articles/{aid}")
-    public JsonResult getArticleByAid(@Valid @PathVariable("aid")int aid, HttpServletRequest request) {
+    public JsonResult getArticleByAid(@PathVariable("aid")int aid, HttpServletRequest request) {
         // 获取访问者真实ip
         String ip = articlesService.getIp(request);
         Article article = articlesService.getArticle(aid, ip);
@@ -69,7 +64,7 @@ public class ShowController {
 
     @ApiOperation("获取我的所有标签")
     @GetMapping("/tags/{uid}")
-    public JsonResult getAllTags(@Valid @PathVariable("uid") String uid){
+    public JsonResult getAllTags(@PathVariable("uid") String uid){
         MyTag myTag = tagService.getAllTags(uid);
         if (myTag == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -80,7 +75,7 @@ public class ShowController {
 
     @ApiOperation("根据我的标签分页获取文章")
     @GetMapping("/articles/{uid}/tag/{tag}/{index}/{size}")
-    public JsonResult getArticlesByTag(@Valid @PathVariable("uid")String uid,@PathVariable("tag")String  tag,
+    public JsonResult getArticlesByTag(@PathVariable("uid")String uid,@PathVariable("tag")String  tag,
                                        @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByTag(index,size,uid,tag);
         if (articles.isEmpty()){
@@ -92,7 +87,7 @@ public class ShowController {
 
     @ApiOperation("根据我的分类分页获取文章")
     @GetMapping("/articles/{uid}/category/{category}/{index}/{size}")
-    public JsonResult getArticlesByCategory(@Valid @PathVariable("uid")String uid,@PathVariable("category")String  category,
+    public JsonResult getArticlesByCategory(@PathVariable("uid")String uid,@PathVariable("category")String  category,
                                        @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByCategory(index,size,uid,category);
         if (articles.isEmpty()){
@@ -104,7 +99,7 @@ public class ShowController {
 
     @ApiOperation("获取我的所有归档")
     @GetMapping("/archives/{uid}")
-    public JsonResult getAllArchives(@Valid @PathVariable("uid") String uid){
+    public JsonResult getAllArchives(@PathVariable("uid") String uid){
         Map<String , Integer> archives = tagService.getAllArchives(uid);
         if (archives == null){
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -115,7 +110,7 @@ public class ShowController {
 
     @ApiOperation("根据我的归档分页获取文章")
     @GetMapping("/articles/{uid}/archive/{archive}/{index}/{size}")
-    public JsonResult getArticlesByDate(@Valid @PathVariable("uid")String uid,@PathVariable("archive")String  archive,
+    public JsonResult getArticlesByDate(@PathVariable("uid")String uid,@PathVariable("archive")String  archive,
                                             @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByArchive(index,size,uid,archive);
         if (articles.isEmpty()){
@@ -127,7 +122,7 @@ public class ShowController {
 
     @ApiOperation("模糊匹配文章标题")
     @GetMapping("/title/regex/{regex}/{index}/{size}")
-    public JsonResult getTitleByRegex(@Valid @PathVariable("regex")String regex,
+    public JsonResult getTitleByRegex(@PathVariable("regex")String regex,
                                         @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
         if (articles.isEmpty()){
@@ -146,7 +141,7 @@ public class ShowController {
 
     @ApiOperation("模糊匹配文章")
     @PostMapping("/article/regex")
-    public JsonResult getArticleByRegex(@Valid @RequestParam("regex")String regex,
+    public JsonResult getArticleByRegex(@RequestParam("regex")String regex,
                                         @RequestParam("index")int index,@RequestParam("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByRegex(index, size, regex);
         if (articles.isEmpty()){
@@ -158,7 +153,7 @@ public class ShowController {
 
     @ApiOperation("站内文章模糊搜索")
     @GetMapping("/article/{regex}/{uid}/{index}/{size}")
-    public JsonResult getArticleByRegex(@Valid @PathVariable("regex")String regex,@PathVariable("uid")String uid,
+    public JsonResult getArticleByRegex(@PathVariable("regex")String regex,@PathVariable("uid")String uid,
                                         @PathVariable("index")int index,@PathVariable("size")int size){
         PageImpl<Article> articles = articlesService.getArticleByRegexByUid(index, size, regex, uid);
         if (articles.isEmpty()){

@@ -1,14 +1,10 @@
 package ncu.soft.blog.controller.article;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiOperation;
-import ncu.soft.blog.component.WebSocketServer;
 import ncu.soft.blog.entity.Message;
 import ncu.soft.blog.selfannotation.LoginToken;
 import ncu.soft.blog.service.ArticlesService;
 import ncu.soft.blog.service.MessageService;
-import ncu.soft.blog.service.impl.ArticlesServiceImpl;
-import ncu.soft.blog.service.impl.MessageServiceImpl;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.data.domain.PageImpl;
@@ -26,17 +22,17 @@ import javax.validation.Valid;
 public class ManageController {
 
     @Resource
-    ArticlesServiceImpl articlesService;
+    ArticlesService articlesService;
 
     @Resource
-    MessageServiceImpl messageService;
+    MessageService messageService;
 
     private final static String LIKE = "like";
 
     @ApiOperation("删除文章")
     @DeleteMapping("/articles/{aid}/{uid}")
     @LoginToken
-    public JsonResult deleteArticle(@Valid @PathVariable("aid") int aid,@PathVariable("uid") String uid){
+    public JsonResult deleteArticle(@PathVariable("aid") int aid,@PathVariable("uid") String uid){
         articlesService.delete(aid,uid);
         return JsonResult.success();
     }

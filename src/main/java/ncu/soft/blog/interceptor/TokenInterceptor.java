@@ -66,7 +66,7 @@ public class TokenInterceptor implements HandlerInterceptor {
                     try {
                         uid = JWT.decode(token).getAudience().get(0);
                     }catch (JWTDecodeException jd){
-                        //token取数据出问题
+                        // token取数据出问题
                         response.setStatus(401);
                         return false;
                     }

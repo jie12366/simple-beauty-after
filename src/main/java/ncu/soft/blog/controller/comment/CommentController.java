@@ -3,8 +3,8 @@ package ncu.soft.blog.controller.comment;
 import io.swagger.annotations.ApiOperation;
 import ncu.soft.blog.entity.Comment;
 import ncu.soft.blog.selfannotation.LoginToken;
-import ncu.soft.blog.service.impl.CommentServiceImpl;
-import ncu.soft.blog.service.impl.MessageServiceImpl;
+import ncu.soft.blog.service.CommentService;
+import ncu.soft.blog.service.MessageService;
 import ncu.soft.blog.utils.JsonResult;
 import ncu.soft.blog.utils.ResultCode;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +22,19 @@ import java.util.List;
 public class CommentController {
 
     @Resource
-    CommentServiceImpl commentService;
+    CommentService commentService;
 
     @Resource
-    MessageServiceImpl messageService;
+    MessageService messageService;
 
+    /**
+     * 评论文章
+     * @param aid 被评论的文章ID
+     * @param uid 评论者的ID
+     * @param toUid 要评论的用户ID（也就是该文章的作者）
+     * @param content 评论的内容
+     * @return 操作结果
+     */
     @ApiOperation("将评论存入")
     @PostMapping("/comments")
     @LoginToken
@@ -34,7 +42,7 @@ public class CommentController {
                                    @RequestParam("toUid") String toUid,@RequestParam("content") String content){
         Comment comment = new Comment(aid,uid,content);
         if (commentService.save(comment) != null){
-            messageService.pushCommentMessage(aid,toUid,"comment");
+            messageService.pushCommentMessage(aid, uid, toUid,"comment");
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);
@@ -48,7 +56,7 @@ public class CommentController {
                                 @RequestParam("content")String content,@RequestParam("rContent")String rContent){
         Comment comment = new Comment(aid,uid,rUid,content,rContent);
         if (commentService.saveReply(comment) != null){
-            messageService.pushCommentMessage(aid,rUid,"reply");
+            messageService.pushCommentMessage(aid, uid, rUid,"reply");
             return JsonResult.success();
         }else {
             return JsonResult.failure(ResultCode.RESULE_DATA_NONE);

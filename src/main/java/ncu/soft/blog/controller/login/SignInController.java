@@ -50,15 +50,15 @@ public class SignInController {
             return JsonResult.failure(ResultCode.USER_LOGIN_ERROR);
         }else {
             Users users1 = userService.findByAccount(users.getUAccount());
-            //利用JWT生成token
+            // 利用JWT生成token
             String token = JwtUtil.generateToken(users1);
-            //将生成的token的签证作为redis的键
+            // 将生成的token的签证作为redis的键
             String key = token.split("\\.")[2];
             if (remeberMe){
-                //如果勾选了记住密码，则将过期时间设置为七天
+                // 如果勾选了记住密码，则将过期时间设置为七天
                 valueOperations.set(key,token,7,TimeUnit.DAYS);
             }else {
-                //将token存入redis并设置过期时间为7小时
+                // 将token存入redis并设置过期时间为7小时
                 valueOperations.set(key,token,7,TimeUnit.HOURS);
             }
             return JsonResult.success(token);
@@ -68,7 +68,7 @@ public class SignInController {
     @ApiOperation("账号注销")
     @DeleteMapping("/logout/{uid}")
     public JsonResult logout(@Valid @PathVariable("uid")String uid, HttpServletRequest request){
-        //从http请求头中取出token
+        // 从http请求头中取出token
         String token = request.getHeader("Authorization");
         // 如果uid不全是数字（说明是QQ登录的id），或者不存在这个账号，那么就是第三方登录
         if (!StringUtils.isNumeric(uid) || userService.findById(Integer.parseInt(uid)) == null){

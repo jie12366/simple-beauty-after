@@ -52,7 +52,7 @@ public class CommentController {
     @ApiOperation("将评论回复存入")
     @PostMapping("/replyComments")
     @LoginToken
-    public JsonResult saveReply(@Valid @RequestParam("aid")int aid,@RequestParam("uid")String uid,@RequestParam("rUid")String rUid,
+    public JsonResult saveReply(@RequestParam("aid")int aid,@RequestParam("uid")String uid,@RequestParam("rUid")String rUid,
                                 @RequestParam("content")String content,@RequestParam("rContent")String rContent){
         Comment comment = new Comment(aid,uid,rUid,content,rContent);
         if (commentService.saveReply(comment) != null){

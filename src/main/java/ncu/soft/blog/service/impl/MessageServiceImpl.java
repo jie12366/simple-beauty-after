@@ -81,6 +81,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void pushCommentMessage(int aid,String uid, String toUid,String type){
         Article article = articlesService.getArticle(aid);
+        // 获取评论者的信息
         UsersInfo usersInfo = usersInfoService.findByUid(String.valueOf(uid));
         // 向客户端推送消息，有人评论了
         webSocketServer.sendInfo("comment",String.valueOf(toUid));
@@ -90,9 +91,9 @@ public class MessageServiceImpl implements MessageService {
         }else {
             message = "评论了你的博文";
         }
-        // 将评论消息存入数据库
-        Message message1 = new Message(COMMENT,aid,uid,message,
-                article.getTitle(),usersInfo.getNickName(),new Date(),false);
+        // 将评论消息存入到被评论者的消息表中
+        Message message1 = new Message(COMMENT, aid, toUid, message,
+                article.getTitle(), usersInfo.getNickName(), new Date(),false);
         save(message1);
     }
 

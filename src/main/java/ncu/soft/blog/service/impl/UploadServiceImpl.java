@@ -54,7 +54,7 @@ public class UploadServiceImpl implements UploadService, InitializingBean {
         //根据时间戳创建文件名
         String fileName = System.currentTimeMillis() + file.getOriginalFilename();
         //创建文件的实际路径
-        String destFileName = request.getServletContext().getRealPath("") + "uploaded" + File.separator + fileName;
+        String destFileName = request.getServletContext().getRealPath("") + File.separator + fileName;
         //根据文件路径创建文件对应的实际文件
         File destFile = new File(destFileName);
         //创建文件实际路径

@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author www.xyjz123.xyz
@@ -16,11 +17,11 @@ import java.io.IOException;
 public interface UploadService {
     /**
      * 上传文件
-     * @param file File
+     * @param stream InputStream
      * @return 服务器返回的响应
      * @throws QiniuException
      */
-    Response uploadFile(File file) throws QiniuException;
+    Response uploadFile(InputStream stream, String key) throws QiniuException;
 
     /**
      * 上传文件到七牛云并返回地址

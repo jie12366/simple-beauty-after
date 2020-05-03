@@ -18,6 +18,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 /**
  * @author www.xyjz123.xyz
@@ -36,14 +38,13 @@ public class UploadServiceImpl implements UploadService, InitializingBean {
     @Resource
     private QiniuUtil qiNiuProperties;
     private StringMap putPolicy;
-    String key = null;
 
     @Override
-    public Response uploadFile(File file) throws QiniuException {
-        Response response = this.uploadManager.put(file, key, getUploadToken());
+    public Response uploadFile(InputStream stream, String key) throws QiniuException {
+        Response response = this.uploadManager.put(stream, key, getUploadToken(), null, null);
         int retry = 0;
         while (response.needRetry() && retry < 3) {
-            response = this.uploadManager.put(file, key, getUploadToken());
+            response = this.uploadManager.put(stream, key, getUploadToken(), null, null);
             retry++;
         }
         return response;
@@ -51,20 +52,17 @@ public class UploadServiceImpl implements UploadService, InitializingBean {
 
     @Override
     public String getPath(HttpServletRequest request, MultipartFile file) throws IOException {
-        //根据时间戳创建文件名
-        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
-        //创建文件的实际路径
-        String destFileName = request.getServletContext().getRealPath("") + File.separator + fileName;
-        //根据文件路径创建文件对应的实际文件
-        File destFile = new File(destFileName);
-        //创建文件实际路径
-        destFile.getParentFile().mkdirs();
-        //将文件传到对应的文件位置
-        file.transferTo(destFile);
-        Response response = uploadFile(destFile);
-        //解析上传成功的结果
-        DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
-        return  "http://cdn.jie12366.xyz/" + putRet.key;
+        String originalFilename = file.getOriginalFilename();
+        // 文件后缀
+        if (originalFilename != null) {
+            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String fileKey = UUID.randomUUID().toString() + suffix;
+            Response response = uploadFile(file.getInputStream(), fileKey);
+            //解析上传成功的结果
+            DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
+            return  "http://cdn.jie12366.xyz/" + putRet.key;
+        }
+        return null;
     }
 
     @Override
